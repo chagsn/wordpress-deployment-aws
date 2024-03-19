@@ -19,20 +19,60 @@ module "db" {
 
     iam_database_authentication_enabled = true
 
+    # Multi AZ confinguration
     multi_az               = true
-    db_subnet_group_name   = [var.vpc_db_group]
+
+    # Db subnet group
+    db_subnet_group_name   = var.vpc_db_group
     vpc_security_group_ids = [var.security_group_id]
-  
+
+    kms_key_id = var.encryption_key
+    
     maintenance_window = "Mon:00:00-Mon:03:00"
     backup_window = "03:00-06:00"
+
+    # CloudWatch logs
     enabled_cloudwatch_logs_exports = ["general"]
     create_cloudwatch_log_group     = true
 
+    # Enhanced Monitoring - see example for details on how to create the role
     monitoring_interval = "60"
     monitoring_role_name   = "MyRDSMonitoringRole"
     create_monitoring_role = true
 
+    # No creation of snapshot before deleting
     skip_final_snapshot = true
+
+    # Database Deletion Protection
     deletion_protection = false
+
+
+      parameters = [
+    {
+      name  = "character_set_client"
+      value = "utf8mb4"
+    },
+    {
+      name  = "character_set_server"
+      value = "utf8mb4"
+    }
+  ]
+
+  options = [
+    {
+      option_name = "MARIADB_AUDIT_PLUGIN"
+
+      option_settings = [
+        {
+          name  = "SERVER_AUDIT_EVENTS"
+          value = "CONNECT"
+        },
+        {
+          name  = "SERVER_AUDIT_FILE_ROTATIONS"
+          value = "37"
+        },
+      ]
+    },
+  ]
 
 }

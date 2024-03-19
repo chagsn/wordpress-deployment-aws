@@ -1,13 +1,17 @@
 variable "db_name" {
   type = string
   description = "This is the name of the rds database"
-  default = "WP_DB"
+  default = "wordpressdb"
 }
 
 variable "vpc_db_group" {
-  type = list(string)
+  type = string
 }
 
 variable "security_group_id" {
+  type = string
+}
+
+variable "encryption_key" {
   type = string
 }

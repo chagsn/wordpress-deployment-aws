@@ -10,5 +10,5 @@ output "vpc_cidr_block" {
 }
 
 output "database_subnet_group" {
-  value = module.vpc.database_subnet_group
+  value = module.vpc.database_subnet_group_name
 }
