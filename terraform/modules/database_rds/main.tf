@@ -15,6 +15,7 @@ module "db" {
 
     db_name  = var.db_name
     username = "user"
+    manage_master_user_password = true  # Create the password and store it in Secrets Manager
     port     = 3306
 
     iam_database_authentication_enabled = true
