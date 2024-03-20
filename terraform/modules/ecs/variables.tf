@@ -3,6 +3,11 @@ variable "env" {
   type = string
 }
 
+variable "capacity_provider_strategy" {
+  description = "Allocation strategy between Fargate-standard and Fargate-spot capacity providers:{Fargate_weight,Fargate_spot_weight}"
+  type = map(number)
+}
+
 variable "alb_target_group_id" {
   description = "ARN of the target group of the ALB spreading trafic to the cluster"
   type = string

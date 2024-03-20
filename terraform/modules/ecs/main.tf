@@ -43,7 +43,7 @@ module "wordpress-service" {
   autoscaling_min_capacity = var.autoscaling_range["min_capacity"]
   autoscaling_max_capacity = var.autoscaling_range["max_capacity"]
 
-  container_definitions = module.wordpress-container.definition
+  container_definitions = module.wordpress-container.container_definition
 
   load_balancer = {
     target_group_arn = "${var.alb_target_group_id}"
@@ -59,9 +59,9 @@ module "wordpress-service" {
   task_exec_secret_arns = []
   task_exec_ssm_param_arns = []
 
-  volume {
+  volume = {
     name = "wordpress-data"
-    efs_volume_configuration {
+    efs_volume_configuration = {
       file_system_id = "${var.efs_id}"
     }
   }
@@ -84,7 +84,7 @@ module "wordpress-container" {
   environment = [
     {
         name = "WORDPRESS_DB_HOST"
-        value = "${var.rds_database["db_hostname"]}"
+        value = "${var.rds_database["db_address"]}"
     },
     {
         name = "WORDPRESS_DB_USER"
