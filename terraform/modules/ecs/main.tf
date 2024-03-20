@@ -84,7 +84,7 @@ module "wordpress-container" {
   environment = [
     {
         name = "WORDPRESS_DB_HOST"
-        value = "${var.rds_database["db_hostname"]}"
+        value = "${var.rds_database["db_address"]}"
     },
     {
         name = "WORDPRESS_DB_USER"
