@@ -29,7 +29,7 @@ module "ecs" {
   rds_database = {
     db_address  = module.rds.db_address
     db_username = "${var.db_username}"
-    db_password = "${var.db_password}"
+    #db_password = "${var.db_password}"
     db_name     = module.rds.db_name
   }
 

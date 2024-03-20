@@ -43,13 +43,13 @@ module "wordpress-service" {
   autoscaling_min_capacity = var.autoscaling_range["min_capacity"]
   autoscaling_max_capacity = var.autoscaling_range["max_capacity"]
 
-  container_definitions = module.wordpress-container.container_definition
-
+  container_definitions = [module.wordpress-container.container_definition]
+  /*
   load_balancer = {
     target_group_arn = "${var.alb_target_group_id}"
     container_name   = "wordpress"
     container_port   = 80
-  }
+  }*/
 
   subnet_ids = var.wordpress_subnet_ids
 
@@ -58,7 +58,7 @@ module "wordpress-service" {
 
   task_exec_secret_arns = []
   task_exec_ssm_param_arns = []
-
+  
   volume = {
     name = "wordpress-data"
     efs_volume_configuration = {
@@ -78,6 +78,8 @@ module "wordpress-container" {
   source  = "terraform-aws-modules/ecs/aws//modules/container-definition"
   version = "5.10.0"
 
+  cpu       = 512
+  memory    = 1024
   name      = "wordpress"
   essential = true
   image     = "${var.wordpress_image["repo_url"]}:${var.wordpress_image["image_tag"]}"
@@ -90,10 +92,10 @@ module "wordpress-container" {
         name = "WORDPRESS_DB_USER"
         value = "${var.rds_database["db_username"]}"
     },
-    {
-        name = "WORDPRESS_DB_PASSWORD"
-        value = "${var.rds_database["db_password"]}"
-    },
+    #{
+    #    name = "WORDPRESS_DB_PASSWORD"
+    #    value = "${var.rds_database["db_password"]}"
+    #},
     {
         name = "WORDPRESS_DB_NAME"
         value = "${var.rds_database["db_name"]}"
