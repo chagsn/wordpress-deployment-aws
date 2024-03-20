@@ -38,7 +38,7 @@ variable "ecs_autoscaling_range" {
   type        = map(number)
   default = {
     min_capacity = 1
-    max_capacity = 5
+    max_capacity = 1
   }
 }
 
