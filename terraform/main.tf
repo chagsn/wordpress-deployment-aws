@@ -17,6 +17,14 @@ module "rds" {
   encryption_key    = var.encryption_key
 }
 
+module "efs" {
+  source = "./modules/efs"
+  env                        = var.env
+  vpc_private_subnet_cidr_block = module.networking.private_subnet_cidr
+  vpc_id = module.networking.vpc_id
+  wordpress_subnet_ids = module.networking.wordpress_subnet_ids
+}
+
 module "ecs" {
   source                     = "./modules/ecs"
   env                        = var.env
@@ -24,7 +32,7 @@ module "ecs" {
   alb_target_group_id        = "" # A faire: ajouter la sortie du module alb
   autoscaling_range          = var.ecs_autoscaling_range
   wordpress_subnet_ids       = module.networking.wordpress_subnet_ids
-  efs_id                     = "" # A faire: ajouter la sortie du module efs
+  efs_id                     = module.efs.efs_id # A faire: ajouter la sortie du module efs
   wordpress_image            = var.wordpress_image
   rds_database = {
     db_address  = module.rds.db_address
