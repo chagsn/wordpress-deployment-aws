@@ -59,12 +59,12 @@ module "wordpress-service" {
   task_exec_secret_arns = []
   task_exec_ssm_param_arns = []
 
-  volume = {
-    name = "wordpress-data"
-    efs_volume_configuration = {
-      file_system_id = "${var.efs_id}"
-    }
-  }
+  # volume = {
+  #   name = "wordpress-data"
+  #   efs_volume_configuration = {
+  #     file_system_id = "${var.efs_id}"
+  #   }
+  # }
     
   tags = {
     Terraform = "true"
@@ -90,10 +90,10 @@ module "wordpress-container" {
         name = "WORDPRESS_DB_USER"
         value = "${var.rds_database["db_username"]}"
     },
-    # {
-    #     name = "WORDPRESS_DB_PASSWORD"
-    #     value = "${var.rds_database["db_password"]}"
-    # },
+    {
+        name = "WORDPRESS_DB_PASSWORD"
+        value = "${var.rds_database["db_password"]}"
+    },
     {
         name = "WORDPRESS_DB_NAME"
         value = "${var.rds_database["db_name"]}"
@@ -109,18 +109,28 @@ module "wordpress-container" {
       name          = "https"
       containerPort = 443
       protocol      = "tcp"
+    },
+    {
+      name          = "nfs"
+      containerPort = 2049
+      protocol      = "tcp"
+    },
+    {
+      name          = "mysql"
+      containerPort = 3306
+      protocol      = "tcp"
     }
   ]
 
   # Il faudra vérifier si l'image wordpress requiert l'accès en écriture au root filesystem
   # readonly_root_filesystem = false
 
-  mount_points = [
-    {
-    containerPath = "/var/www/web"
-    sourceVolume  = "wordpress-data"
-    }
-  ]
+  # mount_points = [
+  #   {
+  #   containerPath = "/var/www/web"
+  #   sourceVolume  = "wordpress-data"
+  #   }
+  # ]
 
   tags = {
     Terraform = "true"
