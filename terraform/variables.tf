@@ -8,19 +8,19 @@ variable "azs" {
   default = ["eu-west-3a", "eu-west-3b"]
 }
 
+variable "db_name" {
+  type    = string
+  default = "wordpress" # A modifier après intégration du module SecretsManager
+}
+
 variable "db_username" {
   type    = string
-  default = "user" # A modifier après intégration du module SecretsManager
+  default = "wp_user" # A modifier après intégration du module SecretsManager
 }
 
 variable "db_password" {
   type    = string
   default = "supersecretpassword" # A modifier après intégration du module SecretsManager
-}
-
-variable "encryption_key" {
-  type    = string
-  default = "arn:aws:kms:eu-west-3:962480255828:key/66c16fcc-ea7f-4aca-8dc1-8ecab3477e49"
 }
 
 variable "fargate_capacity_provider_strategy" {

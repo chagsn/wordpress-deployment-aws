@@ -5,16 +5,18 @@ module "networking" {
 }
 
 module "security_group" {
-  source         = "./modules/security_group"
+  source = "./modules/security_group"
   env    = var.env
-  vpc_id         = module.networking.vpc_id
+  vpc_id = module.networking.vpc_id
 }
 
 module "rds" {
   source            = "./modules/database_rds"
   vpc_db_group      = module.networking.database_subnet_group
   security_group_id = module.security_group.db_security_group_id
-  encryption_key    = var.encryption_key
+  db_name           = var.db_name
+  db_username       = var.db_username
+  db_password       = var.db_password
 }
 
 module "ecs" {
@@ -28,9 +30,9 @@ module "ecs" {
   wordpress_image            = var.wordpress_image
   rds_database = {
     db_address  = module.rds.db_address
-    db_username = "${var.db_username}"
-    # db_password = "${var.db_password}"
-    db_name     = module.rds.db_name
+    db_name     = var.db_name
+    db_username = var.db_username
+    db_password = var.db_password
   }
 
 }
