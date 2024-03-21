@@ -26,6 +26,7 @@ module "ecs" {
   alb_target_group_id        = "" # A faire: ajouter la sortie du module alb
   autoscaling_range          = var.ecs_autoscaling_range
   wordpress_subnet_ids       = module.networking.wordpress_subnet_ids
+  security_group_id          = module.security_group.ecs_security_group_id
   efs_id                     = "" # A faire: ajouter la sortie du module efs
   wordpress_image            = var.wordpress_image
   rds_database = {

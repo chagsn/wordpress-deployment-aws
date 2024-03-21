@@ -54,7 +54,7 @@ module "wordpress-service" {
   subnet_ids = var.wordpress_subnet_ids
 
   create_security_group = false
-  security_group_ids = []
+  security_group_ids = [var.security_group_id]
 
   task_exec_secret_arns = []
   task_exec_ssm_param_arns = []

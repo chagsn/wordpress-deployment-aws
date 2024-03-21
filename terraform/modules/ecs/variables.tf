@@ -23,6 +23,11 @@ variable "wordpress_subnet_ids" {
   type = list(string)
 }
 
+variable "security_group_id" {
+  description = "Id of the security group to attach to the ECS service"
+  type = string
+}
+
 variable "efs_id" {
   description = "ARN of the shared EFS to mount on containers for persistent wordpress data storage"
   type = string
