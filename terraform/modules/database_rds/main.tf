@@ -48,7 +48,7 @@ module "db" {
   # No creation of snapshot before deleting
   skip_final_snapshot = true
 
-  # Database Deletion Protection
+  # Disable database Deletion Protection
   deletion_protection = false
 
 
