@@ -4,19 +4,19 @@ module "vpc" {
   version = "5.6.0"
 
   name = "${var.env}-vpc"
-  cidr = "10.0.0.0/16"
+  cidr = var.vpc_cidr
   azs             = var.azs
 
   # Create public subnet in each AZ
-  public_subnets  = ["10.0.101.0/24", "10.0.102.0/24"]
+  public_subnets  = var.public_subnets_cidr
   public_subnet_names = ["public_subnet1", "public_subnet2"]
 
   # Create private subnet for wordpress instances in each AZ
-  private_subnets = ["10.0.1.0/24", "10.0.2.0/24"]
-  private_subnet_names = ["private_subnet1", "private_subnet2"]
+  private_subnets = var.wordpress_subnets_cidr
+  private_subnet_names = ["wordpress_subnet1", "wordpress_subnet2"]
   
   # Create private subnet for RDS instances in each AZ
-  database_subnets = ["10.0.201.0/24", "10.0.202.0/24"]
+  database_subnets = var.database_subnets_cidr
   database_subnet_names = ["DB_subnet1", "DB_subnet2"]
 
   # Create one NAT gateway public subnet of each AZ

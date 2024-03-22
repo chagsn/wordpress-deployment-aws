@@ -2,6 +2,10 @@ module "networking" {
   source = "./modules/networking"
   env    = var.env
   azs    = var.azs
+  vpc_cidr = var.vpc_cidr
+  public_subnets_cidr = var.public_subnets_cidr
+  wordpress_subnets_cidr = var.wordpress_subnets_cidr
+  database_subnets_cidr = var.database_subnets_cidr
 }
 
 module "security_group" {
