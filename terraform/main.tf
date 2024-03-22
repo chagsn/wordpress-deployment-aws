@@ -14,20 +14,19 @@ module "security_group" {
   vpc_id = module.networking.vpc_id
 }
 
-module "rds" {
-  source            = "./modules/database_rds"
-  vpc_db_group      = module.networking.database_subnet_group
-  security_group_id = module.security_group.db_security_group_id
-  db_name           = var.db_name
-  db_username       = var.db_username
-  db_password       = var.db_password
-}
+# module "alb" {
+#   source            = "./modules/alb"
+#   env = var.env
+#   vpc_id = module.networking.vpc_id
+#   public_subnets_ids = module.networking.publics_subnet_ids
+# }
+
 
 module "ecs" {
   source                     = "./modules/ecs"
   env                        = var.env
   capacity_provider_strategy = var.fargate_capacity_provider_strategy
-  alb_target_group_id        = "" # A faire: ajouter la sortie du module alb
+  alb_target_group_id        = ""
   autoscaling_range          = var.ecs_autoscaling_range
   wordpress_subnet_ids       = module.networking.wordpress_subnet_ids
   security_group_id          = module.security_group.ecs_security_group_id
@@ -39,5 +38,20 @@ module "ecs" {
     db_username = var.db_username
     db_password = var.db_password
   }
-
 }
+
+module "efs" {
+  source               = "./modules/efs"
+  env                  = var.env
+  wordpress_subnet_ids = module.networking.wordpress_subnet_ids
+}
+
+module "rds" {
+  source            = "./modules/database_rds"
+  vpc_db_group      = module.networking.database_subnet_group
+  security_group_id = module.security_group.db_security_group_id
+  db_name           = var.db_name
+  db_username       = var.db_username
+  db_password       = var.db_password
+}
+

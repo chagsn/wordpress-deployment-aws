@@ -9,6 +9,9 @@ output "vpc_cidr_block" {
   value = module.vpc.vpc_cidr_block
 }
 
+output "publics_subnet_ids" {
+  value = module.vpc.public_subnets
+}
 output "wordpress_subnet_ids" {
   value = module.vpc.private_subnets
 }

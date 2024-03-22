@@ -46,11 +46,11 @@ module "wordpress-service" {
   container_definitions = [module.wordpress-container.container_definition]
 
   # Link to the load balancer 
-#   load_balancer = {
-#     target_group_arn = "${var.alb_target_group_id}"
-#     container_name   = "wordpress"
-#     container_port   = 80
-#   }
+  # load_balancer = {
+  #   target_group_arn = var.alb_target_group_id
+  #   container_name   = "wordpress"
+  #   container_port   = 80
+  # }
 
   # Network configuration
   network_mode = "awsvpc"
