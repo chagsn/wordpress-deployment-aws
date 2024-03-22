@@ -37,13 +37,13 @@ module "db" {
   backup_window = "03:00-06:00"
 
   # CloudWatch logs
-  # enabled_cloudwatch_logs_exports = ["general"]
-  # create_cloudwatch_log_group     = true
+  enabled_cloudwatch_logs_exports = ["general"]
+  create_cloudwatch_log_group     = true
 
   # Enhanced Monitoring - see example for details on how to create the role
-  # monitoring_interval = "60"
-  # monitoring_role_name   = "MyRDSMonitoringRole"
-  # create_monitoring_role = true
+  monitoring_interval = "60"
+  monitoring_role_name   = "MyRDSMonitoringRole"
+  create_monitoring_role = true
 
   # No creation of snapshot before deleting
   skip_final_snapshot = true
@@ -63,21 +63,21 @@ module "db" {
     }
   ]
 
-  # options = [
-  #   {
-  #     option_name = "MARIADB_AUDIT_PLUGIN"
+  options = [
+    {
+      option_name = "MARIADB_AUDIT_PLUGIN"
 
-  #     option_settings = [
-  #       {
-  #         name  = "SERVER_AUDIT_EVENTS"
-  #         value = "CONNECT"
-  #       },
-  #       {
-  #         name  = "SERVER_AUDIT_FILE_ROTATIONS"
-  #         value = "37"
-  #       },
-  #     ]
-  #   },
-  # ]
+      option_settings = [
+        {
+          name  = "SERVER_AUDIT_EVENTS"
+          value = "CONNECT"
+        },
+        {
+          name  = "SERVER_AUDIT_FILE_ROTATIONS"
+          value = "37"
+        },
+      ]
+    },
+  ]
 
 }
