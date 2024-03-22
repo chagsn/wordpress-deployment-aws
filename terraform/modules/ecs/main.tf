@@ -35,37 +35,42 @@ module "wordpress-service" {
   name        = "wordpress"
   cluster_arn = module.wordpress-cluster.id
 
+  # CPU and memeory sizing
   cpu    = 1024
   memory = 4096
 
-  network_mode = "awsvpc"
-
+  # Autoscaling configuration
   autoscaling_min_capacity = var.autoscaling_range["min_capacity"]
   autoscaling_max_capacity = var.autoscaling_range["max_capacity"]
 
   container_definitions = [module.wordpress-container.container_definition]
 
+  # Link to the load balancer 
 #   load_balancer = {
 #     target_group_arn = "${var.alb_target_group_id}"
 #     container_name   = "wordpress"
 #     container_port   = 80
 #   }
 
+  # Network configuration
+  network_mode = "awsvpc"
+
   subnet_ids = var.wordpress_subnet_ids
 
   create_security_group = false
   security_group_ids = [var.security_group_id]
 
-  task_exec_secret_arns = []
-  task_exec_ssm_param_arns = []
-
+  # EFS storage configuration
   # volume = {
   #   name = "wordpress-data"
   #   efs_volume_configuration = {
   #     file_system_id = "${var.efs_id}"
   #   }
   # }
-    
+
+  task_exec_secret_arns = []
+  task_exec_ssm_param_arns = []
+  
   tags = {
     Terraform = "true"
     Environment = "${var.env}"
@@ -124,7 +129,8 @@ module "wordpress-container" {
 
   # Il faudra vérifier si l'image wordpress requiert l'accès en écriture au root filesystem
   # readonly_root_filesystem = false
-
+  
+  # Mounting points to EFS storage
   # mount_points = [
   #   {
   #   containerPath = "/var/www/web"

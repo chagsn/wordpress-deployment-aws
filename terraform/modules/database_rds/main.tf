@@ -33,6 +33,7 @@ module "db" {
   db_subnet_group_name   = var.vpc_db_group
   vpc_security_group_ids = [var.security_group_id]
 
+  # Maintenance configuration
   maintenance_window = "Mon:00:00-Mon:03:00"
   backup_window = "03:00-06:00"
 

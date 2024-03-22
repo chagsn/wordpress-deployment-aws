@@ -128,9 +128,7 @@ resource "aws_security_group_rule" "ecs_sg_ingress_rule_alb" {
   to_port           = each.key
   protocol          = "tcp"
   security_group_id = aws_security_group.ecs_security_group.id
-  # Test: on autorise le trafic entrant de toutes les sources en attendant l'id du sg de l'ALB
-  # source_security_group_id = aws_security_group.alb_security_group.id
-  cidr_blocks  = ["0.0.0.0/0"]
+  source_security_group_id = aws_security_group.alb_security_group.id
 }
 
 resource "aws_security_group_rule" "ecs_sg_egress_rule_alb" {
@@ -141,9 +139,7 @@ resource "aws_security_group_rule" "ecs_sg_egress_rule_alb" {
   to_port           = each.key
   protocol          = "tcp"
   security_group_id = aws_security_group.ecs_security_group.id
-  # Test: on autorise le trafic sortant vers toutes les destinations en attendant l'id du sg de l'ALB
-  # source_security_group_id = aws_security_group.alb_security_group.id
-  cidr_blocks  = ["0.0.0.0/0"]
+  source_security_group_id = aws_security_group.alb_security_group.id
 }
 
 # Autorisation du trafic avec l'EFS
