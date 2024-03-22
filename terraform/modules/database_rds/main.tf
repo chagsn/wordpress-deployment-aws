@@ -8,7 +8,7 @@ module "db" {
   engine_version         = "8.0"
   family                 = "mysql8.0"
   major_engine_version   = "8.0"
-  instance_class         = "db.t2.small"
+  instance_class         = "db.t3.small"
 
   allocated_storage      = 20
   max_allocated_storage  = 100
