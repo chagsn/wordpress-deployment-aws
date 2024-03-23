@@ -9,28 +9,32 @@ module "networking" {
 }
 
 module "security_group" {
-  source = "./modules/security_group"
-  env    = var.env
-  vpc_id = module.networking.vpc_id
+  source                = "./modules/security_group"
+  env                   = var.env
+  vpc_id                = module.networking.vpc_id
+  efs_security_group_id = module.efs.efs_security_group_id
 }
 
-# module "alb" {
-#   source            = "./modules/alb"
-#   env = var.env
-#   vpc_id = module.networking.vpc_id
-#   public_subnets_ids = module.networking.publics_subnet_ids
-# }
+module "alb" {
+  source                = "./modules/alb"
+  env                   = var.env
+  vpc_id                = module.networking.vpc_id
+  public_subnets_ids    = module.networking.publics_subnet_ids
+  alb_security_group_id = module.security_group.alb_security_group_id
+}
 
 
 module "ecs" {
   source                     = "./modules/ecs"
   env                        = var.env
   capacity_provider_strategy = var.fargate_capacity_provider_strategy
-  alb_target_group_id        = ""
+  alb_target_group_id        = module.alb.alb_target_group_id
   autoscaling_range          = var.ecs_autoscaling_range
-  wordpress_subnet_ids       = module.networking.wordpress_subnet_ids
+  # wordpress_subnet_ids       = module.networking.wordpress_subnet_ids
+  # Test
+  wordpress_subnet_ids       = module.networking.publics_subnet_ids
   security_group_id          = module.security_group.ecs_security_group_id
-  efs_id                     = "" # A faire: ajouter la sortie du module efs
+  efs_id                     = module.efs.efs_id
   wordpress_image            = var.wordpress_image
   rds_database = {
     db_address  = module.rds.db_address
@@ -41,9 +45,11 @@ module "ecs" {
 }
 
 module "efs" {
-  source               = "./modules/efs"
-  env                  = var.env
-  wordpress_subnet_ids = module.networking.wordpress_subnet_ids
+  source                = "./modules/efs"
+  env                   = var.env
+  vpc_id                = module.networking.vpc_id
+  ecs_security_group_id = module.security_group.ecs_security_group_id
+  wordpress_subnet_ids  = module.networking.wordpress_subnet_ids
 }
 
 module "rds" {

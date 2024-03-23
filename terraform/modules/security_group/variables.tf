@@ -13,3 +13,8 @@ variable "vpc_id" {
   description = "ID du VPC"
   type        = string
 }
+
+variable "efs_security_group_id" {
+  description = "ID of the EFS volume security group"
+  type = string
+}

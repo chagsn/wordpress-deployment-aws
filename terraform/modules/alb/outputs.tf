@@ -1,3 +1,3 @@
-output "alb_target_groups" {
-  value = module.alb.target_groups
+output "alb_target_group_id" {
+  value = module.alb.target_groups["wordpress-tg"].id
 }

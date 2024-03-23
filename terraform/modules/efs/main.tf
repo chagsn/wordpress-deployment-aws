@@ -2,9 +2,7 @@ module "efs" {
   source  = "terraform-aws-modules/efs/aws"
   version = "1.6.2"
 
-  # File system
-  name           = "wordpress-data"
-  creation_token = "wordpress-data-token"
+  name           = "${var.env}-wordpress-efs-storage"
 
   # No encryption
   encrypted = false
@@ -19,7 +17,25 @@ module "efs" {
     }
   }
 
-  create_security_group = false
+  security_group_name = "${var.env}-efs-sg"
+  security_group_vpc_id = var.vpc_id
+  security_group_rules = {
+    ingress = {
+      type = "ingress"
+      from_port   = 2049
+      to_port     = 2049
+      protocol    = "tcp"
+      source_security_group_id = var.ecs_security_group_id
+    }
+    egress = {
+      type = "egress"
+      from_port   = 2049
+      to_port     = 2049
+      protocol    = "tcp"
+      source_security_group_id = var.ecs_security_group_id
+    }
+
+  }
 
   tags = {
     Terraform   = "true"

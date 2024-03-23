@@ -62,32 +62,32 @@ resource "aws_security_group" "ecs_security_group" {
 
 
 # Configuration du security group pour les points de montage du système de fichiers EFS
-resource "aws_security_group" "efs_security_group" {
-  name        = "${var.env}-efs-sg"
-  description = "Security group for EFS in ${var.env} environment"
-  vpc_id      = var.vpc_id
+# resource "aws_security_group" "efs_security_group" {
+#   name        = "${var.env}-efs-sg"
+#   description = "Security group for EFS in ${var.env} environment"
+#   vpc_id      = var.vpc_id
 
-  # Règle de trafic entrant: autorise le trafic entrant en provenance du security group du service ECS wordpress en NFS
-  ingress {
-    from_port   = 2049
-    to_port     = 2049
-    protocol    = "tcp"
-    security_groups = [aws_security_group.ecs_security_group.id]
-  }
+#   # Règle de trafic entrant: autorise le trafic entrant en provenance du security group du service ECS wordpress en NFS
+#   ingress {
+#     from_port   = 2049
+#     to_port     = 2049
+#     protocol    = "tcp"
+#     security_groups = [aws_security_group.ecs_security_group.id]
+#   }
 
-  # Règle de trafic sortant: autorise le trafic sortant à destination du security group du service ECS wordpress en NFS
-  egress {
-    from_port   = 2049
-    to_port     = 2049
-    protocol    = "tcp"
-    security_groups = [aws_security_group.ecs_security_group.id]
-  }
+#   # Règle de trafic sortant: autorise le trafic sortant à destination du security group du service ECS wordpress en NFS
+#   egress {
+#     from_port   = 2049
+#     to_port     = 2049
+#     protocol    = "tcp"
+#     security_groups = [aws_security_group.ecs_security_group.id]
+#   }
 
-  tags = {
-    Terraform   = "true"
-    Environment = var.env
-  }
-}
+#   tags = {
+#     Terraform   = "true"
+#     Environment = var.env
+#   }
+# }
 
 # Configuration du security group pour la base de données RDS
 resource "aws_security_group" "db_security_group" {
@@ -128,7 +128,9 @@ resource "aws_security_group_rule" "ecs_sg_ingress_rule_alb" {
   to_port           = each.key
   protocol          = "tcp"
   security_group_id = aws_security_group.ecs_security_group.id
-  source_security_group_id = aws_security_group.alb_security_group.id
+  # Test
+  # source_security_group_id = aws_security_group.alb_security_group.id
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 resource "aws_security_group_rule" "ecs_sg_egress_rule_alb" {
@@ -139,7 +141,9 @@ resource "aws_security_group_rule" "ecs_sg_egress_rule_alb" {
   to_port           = each.key
   protocol          = "tcp"
   security_group_id = aws_security_group.ecs_security_group.id
-  source_security_group_id = aws_security_group.alb_security_group.id
+  # Test
+  # source_security_group_id = aws_security_group.alb_security_group.id
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 # Autorisation du trafic avec l'EFS
@@ -151,7 +155,7 @@ resource "aws_security_group_rule" "ecs_sg_rules_efs" {
   to_port           = 2049
   protocol          = "tcp"
   security_group_id = aws_security_group.ecs_security_group.id
-  source_security_group_id = aws_security_group.efs_security_group.id
+  source_security_group_id = var.efs_security_group_id
 }
 
 # Autorisation du trafic avec la base de données
