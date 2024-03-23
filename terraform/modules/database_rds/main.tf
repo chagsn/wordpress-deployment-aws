@@ -21,8 +21,6 @@ module "db" {
   
   port     = 3306
 
-  iam_database_authentication_enabled = true
-
   # No encryption of the database
   storage_encrypted = false
 

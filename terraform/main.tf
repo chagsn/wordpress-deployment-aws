@@ -23,13 +23,13 @@ module "alb" {
   alb_security_group_id = module.security_group.alb_security_group_id
 }
 
-
 module "ecs" {
   source                     = "./modules/ecs"
   env                        = var.env
   capacity_provider_strategy = var.fargate_capacity_provider_strategy
   alb_target_group_id        = module.alb.alb_target_group_id
   autoscaling_range          = var.ecs_autoscaling_range
+
   # wordpress_subnet_ids       = module.networking.wordpress_subnet_ids
   # Test
   wordpress_subnet_ids       = module.networking.publics_subnet_ids
