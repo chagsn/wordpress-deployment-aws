@@ -3,15 +3,17 @@ variable "env" {
   type = string
 }
 
-variable "wordpress_subnet_ids" {
-  description = "List of private subnets where to deploy the ECS service"
-  type = list(string)
+variable "vpc_id" {
+  description = "ID du VPC"
+  type        = string
 }
 
-variable "vpc_id" {
+variable "ecs_security_group_id" {
+  description = "ECS wordpress service security group id"
   type = string
 }
 
-variable "vpc_private_subnet_cidr_block" {
+variable "wordpress_subnet_ids" {
+  description = "List of private subnets for wordpress instances"
   type = list(string)
 }

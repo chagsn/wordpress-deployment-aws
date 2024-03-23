@@ -1,16 +1,49 @@
 variable "env" {
-  type    = string
-  default = "dev"
+  description = "Deployment environment: dev or prod"
+  type        = string
+  default     = "dev"
 }
 
 variable "azs" {
-  type    = list(string)
-  default = ["eu-west-3a", "eu-west-3b"]
+  description = "List of AZ where to deploy"
+  type        = list(string)
+  default     = ["eu-west-3a", "eu-west-3b"]
+}
+
+# Networking
+variable "vpc_cidr" {
+  description = "CIDR of the VPC"
+  type        = string
+  default     = "10.0.0.0/16"
+}
+
+variable "public_subnets_cidr" {
+  description = "List of CIDRs for the public subnets"
+  type        = list(string)
+  default     = ["10.0.1.0/24", "10.0.2.0/24"]
+}
+
+variable "wordpress_subnets_cidr" {
+  description = "List of CIDRs for the wordpress private subnets"
+  type        = list(string)
+  default     = ["10.0.101.0/24", "10.0.102.0/24"]
+}
+
+variable "database_subnets_cidr" {
+  description = "List of CIDRs for the database private subnets"
+  type        = list(string)
+  default     = ["10.0.201.0/24", "10.0.202.0/24"]
+}
+
+# Database informations
+variable "db_name" {
+  type    = string
+  default = "wordpress" # A modifier après intégration du module SecretsManager
 }
 
 variable "db_username" {
   type    = string
-  default = "user" # A modifier après intégration du module SecretsManager
+  default = "wp_user" # A modifier après intégration du module SecretsManager
 }
 
 variable "db_password" {
@@ -18,11 +51,7 @@ variable "db_password" {
   default = "supersecretpassword" # A modifier après intégration du module SecretsManager
 }
 
-variable "encryption_key" {
-  type    = string
-  default = "arn:aws:kms:eu-west-3:962480255828:key/66c16fcc-ea7f-4aca-8dc1-8ecab3477e49"
-}
-
+# ECS configuration
 variable "fargate_capacity_provider_strategy" {
   description = "Allocation strategy between Fargate-standard and Fargate-spot capacity providers:{Fargate_weight,Fargate_spot_weight}"
   type        = map(number)
@@ -32,13 +61,12 @@ variable "fargate_capacity_provider_strategy" {
   }
 }
 
-
 variable "ecs_autoscaling_range" {
   description = "Map of minimum and maximum capacities for ECS service servautoscaling: {min_capacity,max_capacity}"
   type        = map(number)
   default = {
     min_capacity = 1
-    max_capacity = 1
+    max_capacity = 4
   }
 }
 
