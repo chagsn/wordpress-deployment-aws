@@ -1,56 +1,40 @@
 module "efs" {
-  source = "terraform-aws-modules/efs/aws"
+  source  = "terraform-aws-modules/efs/aws"
+  version = "1.6.2"
 
-  # File system
-  name           = "wordpress-data"
-  creation_token = "wordpress-data-token"
+  name           = "${var.env}-wordpress-efs-storage"
 
+  # No encryption
+  encrypted = false
 
-
-  # Mount targets / security group
+  # Mount targets
   mount_targets = {
-    "eu-west-1a" = {
-      subnet_id = "${var.wordpress_subnet_ids[0]}"
+    "efs-mount-target-1" = {
+      subnet_id = var.wordpress_subnet_ids[0]
     }
-    "eu-west-1b" = {
-      subnet_id = "${var.wordpress_subnet_ids[1]}"
+    "efs-mount-target-2" = {
+      subnet_id = var.wordpress_subnet_ids[1]
     }
   }
 
-  security_group_description = "Example EFS security group"
-  security_group_vpc_id      = var.vpc_id
+  security_group_name = "${var.env}-efs-sg"
+  security_group_vpc_id = var.vpc_id
   security_group_rules = {
-    vpc = {
-      # relying on the defaults provdied for EFS/NFS (2049/TCP + ingress)
-      description = "NFS ingress from VPC private subnets"
-      cidr_blocks = var.vpc_private_subnet_cidr_block
+    ingress = {
+      type = "ingress"
+      from_port   = 2049
+      to_port     = 2049
+      protocol    = "tcp"
+      source_security_group_id = var.ecs_security_group_id
     }
-  }
+    egress = {
+      type = "egress"
+      from_port   = 2049
+      to_port     = 2049
+      protocol    = "tcp"
+      source_security_group_id = var.ecs_security_group_id
+    }
 
-  # Access point(s)
-  access_points = {
-    posix_example = {
-      name = "posix-example"
-      posix_user = {
-        gid            = 1001
-        uid            = 1001
-        secondary_gids = [1002]
-      }
-
-      tags = {
-        Additionl = "yes"
-      }
-    }
-    root_example = {
-      root_directory = {
-        path = "/example"
-        creation_info = {
-          owner_gid   = 1001
-          owner_uid   = 1001
-          permissions = "755"
-        }
-      }
-    }
   }
 
   tags = {

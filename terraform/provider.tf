@@ -18,6 +18,6 @@ terraform {
 
 # Configure the AWS Provider
 provider "aws" {
-  profile = "student15_jan24_poei_storm_web2"
+  profile = "terraform"
   region  = "eu-west-3"
 }
