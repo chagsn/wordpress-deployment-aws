@@ -78,3 +78,13 @@ variable "wordpress_image" {
     image_tag = "beta-php8.3-fpm-alpine"
   }
 }
+
+variable "domain_name" {
+  type = string
+  default = "stormpoei-web2.com"
+}
+
+variable "subdomain" {
+  type = string
+  default = "Wordpress"
+}

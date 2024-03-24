@@ -102,25 +102,25 @@ module "wordpress-service" {
         readonly_root_filesystem = false
   
         # Mounting points to EFS storage
-        # mount_points = [
-        #   {
-        #   containerPath = "/var/www/web"
-        #   sourceVolume  = local.efs_volume
-        #   }
-        # ]
+         mount_points = [
+           {
+           containerPath = "/var/www/web"
+           sourceVolume  = local.efs_volume
+           }
+         ]
     }
   }
 
   # Link to the load balancer 
-  # load_balancer = {
-  #   alb = {
-  #     target_group_arn = var.alb_target_group_id
-  #     container_name   = "wordpress"
-  #     container_port   = 80
-  #   }
-  # }
+   load_balancer = {
+     alb = {
+       target_group_arn = var.alb_target_group_id
+       container_name   = "wordpress"
+       container_port   = 80
+     }
+   }
   # Health_checks configuration
-  # health_check_grace_period_seconds = 120
+   health_check_grace_period_seconds = 120
 
   # Network configuration
   network_mode = "awsvpc"
@@ -133,14 +133,14 @@ module "wordpress-service" {
   security_group_ids = [var.security_group_id]
 
   # EFS storage configuration
-  # volume = [
-  #   {
-  #     name = local.efs_volume
-  #     efs_volume_configuration = {
-  #       file_system_id = var.efs_id
-  #     }
-  #   }
-  # ]
+   volume = [
+     {
+       name = local.efs_volume
+       efs_volume_configuration = {
+         file_system_id = var.efs_id
+       }
+     }
+   ]
 
   task_exec_secret_arns = []
   task_exec_ssm_param_arns = []
