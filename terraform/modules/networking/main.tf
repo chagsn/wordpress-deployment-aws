@@ -5,19 +5,19 @@ module "vpc" {
 
   name = "${var.env}-vpc"
   cidr = var.vpc_cidr
-  azs             = var.azs
+  azs  = var.azs
 
   # Create public subnet in each AZ
   public_subnets  = var.public_subnets_cidr
-  public_subnet_names = ["public_subnet1", "public_subnet2"]
+  public_subnet_names = ["${var.env}-public_subnet1", "${var.env}-public_subnet2"]
 
   # Create private subnet for wordpress instances in each AZ
   private_subnets = var.wordpress_subnets_cidr
-  private_subnet_names = ["wordpress_subnet1", "wordpress_subnet2"]
+  private_subnet_names = ["${var.env}-wordpress_subnet1", "${var.env}-wordpress_subnet2"]
   
   # Create private subnet for RDS instances in each AZ
   database_subnets = var.database_subnets_cidr
-  database_subnet_names = ["DB_subnet1", "DB_subnet2"]
+  database_subnet_names = ["${var.env}-DB_subnet1", "${var.env}-DB_subnet2"]
 
   # Create one NAT gateway public subnet of each AZ
   enable_nat_gateway = true
@@ -28,7 +28,6 @@ module "vpc" {
   manage_default_security_group = false
 
   tags = {
-#    Name = "${var.env}-vpc"
     Terraform = "true"
     Environment = "${var.env}"
   }

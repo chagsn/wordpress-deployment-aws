@@ -21,6 +21,7 @@ module "alb" {
   vpc_id                = module.networking.vpc_id
   public_subnets_ids    = module.networking.publics_subnet_ids
   alb_security_group_id = module.security_group.alb_security_group_id
+  health_check_path = var.alb_health_check_path
 }
 
 module "ecs" {
@@ -29,10 +30,14 @@ module "ecs" {
   capacity_provider_strategy = var.fargate_capacity_provider_strategy
   alb_target_group_id        = module.alb.alb_target_group_id
   autoscaling_range          = var.ecs_autoscaling_range
+<<<<<<< HEAD
 
   # wordpress_subnet_ids       = module.networking.wordpress_subnet_ids
   # Test
   wordpress_subnet_ids       = module.networking.publics_subnet_ids
+=======
+  wordpress_subnet_ids       = module.networking.wordpress_subnet_ids
+>>>>>>> 1475fbe (remise au propre après tests, intégration module ALB)
   security_group_id          = module.security_group.ecs_security_group_id
   efs_id                     = module.efs.efs_id
   wordpress_image            = var.wordpress_image

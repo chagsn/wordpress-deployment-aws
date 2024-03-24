@@ -75,6 +75,14 @@ variable "wordpress_image" {
   type        = map(string)
   default = {
     repo_url  = "public.ecr.aws/docker/library/wordpress"
-    image_tag = "beta-php8.3-fpm-alpine"
+    image_tag = "php8.3"
   }
+}
+
+# ALB configuration
+variable "alb_health_check_path" {
+  description = "URI used by the ALB to check wordpress application health"
+  type        = string
+  default = "/wp-load.php"
+  
 }

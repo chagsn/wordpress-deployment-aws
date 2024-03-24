@@ -17,4 +17,7 @@ variable "alb_security_group_id" {
   description = "ID du security group de l'ALB"
   type        = string
 }
-
+ variable "health_check_path" {
+  description = "URI de destination des health checks effectués par le load balancer sur l'appli wordpress"
+  type = string
+ }

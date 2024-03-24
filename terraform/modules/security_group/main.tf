@@ -1,10 +1,8 @@
 # Local variables
+locals {
 # List of HTTP and HTTPS ports to open
-locals {
   alb_sg_ports = ["80","443"]
-}
 # List of security group rule types
-locals {
   rule_types = ["ingress","egress"]
 }
 
