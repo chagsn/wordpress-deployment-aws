@@ -1,6 +1,6 @@
 # Local variable: EFS-storage volume name
 locals {
-  efs_volume = "wordpress-efs-volume"
+  efs_volume_name = "wordpress-efs-volume"
 }
 
 
@@ -33,6 +33,25 @@ module "wordpress-cluster" {
 
 }
 
+# Création d'une policy pour le Task role autorisant le montage des mount targets de l'EFS
+resource "aws_iam_policy" "task_role_mountefs_policy" {
+  description = "Allows to mount EFS mount targets and access to file system root"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "elasticfilesystem:ClientRootAccess",
+          "elasticfilesystem:ClientWrite",
+          "elasticfilesystem:ClientMount"
+        ]
+        Effect   = "Allow"
+        Resource = "${var.efs_arn}"
+      }
+    ]
+  })
+}
+
 # Configuration du service ECS déployant les Tasks
 module "wordpress-service" {
   source  = "terraform-aws-modules/ecs/aws//modules/service"
@@ -48,6 +67,11 @@ module "wordpress-service" {
   # Autoscaling configuration
   autoscaling_min_capacity = var.autoscaling_range["min_capacity"]
   autoscaling_max_capacity = var.autoscaling_range["max_capacity"]
+
+  # Adding EFS mounting permissions to the default task role created by Terraform
+  tasks_iam_role_policies = {
+    efsmounting = aws_iam_policy.task_role_mountefs_policy.arn
+  }
 
   # Enabling Exec command to be able to execute commands on containers
   enable_execute_command = true
@@ -91,13 +115,15 @@ module "wordpress-service" {
       ]
       # Il faudra vérifier si l'image wordpress requiert l'accès en écriture au root filesystem
       readonly_root_filesystem = false  
+      
       # Mounting points to EFS storage
-      # mount_points = [
-      #   {
-      #   containerPath = "/var/www/web"
-      #   sourceVolume  = local.efs_volume
-      #   }
-      # ]
+      mount_points = [
+        {
+        containerPath = "/var/www/web"
+        sourceVolume  = local.efs_volume_name
+        readOnly      = false
+        }
+      ]
     }
   }
 
@@ -118,18 +144,17 @@ module "wordpress-service" {
   create_security_group = false
   security_group_ids = [var.security_group_id]
 
-  # EFS storage configuration
-  # volume = [
-  #   {
-  #     name = local.efs_volume
-  #     efs_volume_configuration = {
-  #       file_system_id = var.efs_id
-  #     }
-  #   }
-  # ]
+  # EFS volume attachment configuration
+  volume = [
+    {
+      name = local.efs_volume_name
+      efs_volume_configuration = {
+        file_system_id = var.efs_id
+      }
+    }
+  ]
 
   task_exec_secret_arns = []
-  task_exec_ssm_param_arns = []
   
   tags = {
     Terraform = "true"

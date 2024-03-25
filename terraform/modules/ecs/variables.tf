@@ -29,7 +29,11 @@ variable "security_group_id" {
 }
 
 variable "efs_id" {
-  description = "ARN of the shared EFS to mount on containers for persistent wordpress data storage"
+  description = "ID of the shared EFS to mount on containers for persistent wordpress data storage"
+  type = string
+}
+variable "efs_arn" {
+  description = "ID of the shared EFS to mount on containers for persistent wordpress data storage"
   type = string
 }
 
