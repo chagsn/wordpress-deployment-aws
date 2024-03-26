@@ -21,7 +21,7 @@ module "alb" {
   vpc_id                = module.networking.vpc_id
   public_subnets_ids    = module.networking.publics_subnet_ids
   alb_security_group_id = module.security_group.alb_security_group_id
-  health_check_path = var.alb_health_check_path
+  health_check_path     = var.alb_health_check_path
 }
 
 module "ecs" {
@@ -33,12 +33,13 @@ module "ecs" {
   wordpress_subnet_ids       = module.networking.wordpress_subnet_ids
   security_group_id          = module.security_group.ecs_security_group_id
   efs_id                     = module.efs.efs_id
+  efs_arn                    = module.efs.efs_arn
   wordpress_image            = var.wordpress_image
-  rds_database = {
-    db_address  = module.rds.db_address
-    db_name     = var.db_name
-    db_username = var.db_username
-    db_password = var.db_password
+  rds_db_data = {
+    address             = module.rds.db_address
+    username            = var.db_username
+    password_secret_arn = module.rds.db_password_secret_arn
+    db_name             = var.db_name
   }
 }
 
@@ -51,11 +52,12 @@ module "efs" {
 }
 
 module "rds" {
-  source            = "./modules/database_rds"
-  vpc_db_group      = module.networking.database_subnet_group
-  security_group_id = module.security_group.db_security_group_id
-  db_name           = var.db_name
-  db_username       = var.db_username
-  db_password       = var.db_password
+  source                                  = "./modules/database_rds"
+  env                                     = var.env
+  vpc_db_group                            = module.networking.database_subnet_group
+  security_group_id                       = module.security_group.db_security_group_id
+  db_name                                 = var.db_name
+  db_username                             = var.db_username
+  db_password_automatic_rotation_schedule = var.db_password_automatic_rotation_schedule
 }
 

@@ -1,16 +1,21 @@
-variable "db_name" {
+variable "env" {
+  description = "Deployment environment: dev or prod"
   type = string
-  description = "Name of the database to create"
+}
+
+variable "db_name" {
+  description = "Name of the RDS database"
+  type = string
 }
 
 variable "db_username" {
+  description = "Username of the RDS database"
   type = string
-  description = "Username for the master DB user"
 }
 
-variable "db_password" {
-  type = string
-  description = "Password for the master DB user"
+variable "db_password_automatic_rotation_schedule" {
+  description = "Number of days between automatic scheduled rotations of the secret containing the DB password"
+  type = number
 }
 
 variable "vpc_db_group" {

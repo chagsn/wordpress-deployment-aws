@@ -1,8 +1,9 @@
 #Création et configuration AWS RDS Mysql
+
 module "db" {
   source = "terraform-aws-modules/rds/aws"
   version = "6.5.4"
-  identifier = var.db_name
+  identifier = "${var.env}-${var.db_name}"
 
   engine                 = "mysql"
   engine_version         = "8.0"
@@ -13,11 +14,12 @@ module "db" {
   allocated_storage      = 20
   max_allocated_storage  = 100
 
-  db_name  = var.db_name
-  username = var.db_username
-  # Pour l'instant on ne crée pas le password dans Secret Manager, à modifier ultérieurement
-  manage_master_user_password = false
-  password = var.db_password
+  db_name  = "${var.db_name}"
+  username = "${var.db_username}"
+  # Database password is created and managed by the present module
+  manage_master_user_password = true
+  manage_master_user_password_rotation = true
+  master_user_password_rotation_automatically_after_days = var.db_password_automatic_rotation_schedule
   
   port     = 3306
 
@@ -39,7 +41,6 @@ module "db" {
   enabled_cloudwatch_logs_exports = ["general"]
   create_cloudwatch_log_group     = true
 
-  # Enhanced Monitoring - see example for details on how to create the role
   monitoring_interval = "60"
   monitoring_role_name   = "MyRDSMonitoringRole"
   create_monitoring_role = true
@@ -78,5 +79,10 @@ module "db" {
       ]
     },
   ]
+
+  tags = {
+    Terraform = "true"
+    Environment = "${var.env}"
+  }
 
 }

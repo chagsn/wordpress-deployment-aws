@@ -29,7 +29,11 @@ variable "security_group_id" {
 }
 
 variable "efs_id" {
-  description = "ARN of the shared EFS to mount on containers for persistent wordpress data storage"
+  description = "ID of the shared EFS to mount on containers for persistent wordpress data storage"
+  type = string
+}
+variable "efs_arn" {
+  description = "ID of the shared EFS to mount on containers for persistent wordpress data storage"
   type = string
 }
 
@@ -38,7 +42,8 @@ variable "wordpress_image" {
   type = map(string)
 }
 
-variable "rds_database" {
-  description = "RDS database outputs: {db_address,db_username,db_password,db_name}"
+variable "rds_db_data" {
+  description = "RDS database data: address, username, database name, and ARN of the secret created in Secrets Manager containing the DB password "
   type = map(string)
 }
+
