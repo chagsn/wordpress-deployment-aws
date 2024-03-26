@@ -7,6 +7,9 @@ module "efs" {
   # No encryption
   encrypted = false
 
+  # Do not create file system policy: access to EFS is managed through ECS Task role policy in ecs module
+  attach_policy = false
+
   # Mount targets
   mount_targets = {
     "efs-mount-target-1" = {

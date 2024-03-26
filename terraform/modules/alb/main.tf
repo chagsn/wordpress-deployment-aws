@@ -2,7 +2,7 @@ module "alb" {
   source  = "terraform-aws-modules/alb/aws"
   version = "9.8.0"
 
-  name    = "wordpress-alb"
+  name    = "${var.env}-alb"
 
   # Networking
   vpc_id = var.vpc_id
@@ -45,11 +45,21 @@ module "alb" {
   # Target group configuration
   target_groups = {
     wordpress-tg = {
-      name        = "wordpress-tg2"
+      name        = "${var.env}-wordpress-tg"
       protocol    = "HTTP"
       port        = 80
       target_type = "ip"
       create_attachment = false
+      health_check = {
+        interval            = 30
+        path                = var.health_check_path
+        port                = "traffic-port"
+        healthy_threshold   = 2
+        unhealthy_threshold = 3
+        timeout             = 5
+        protocol            = "HTTP"
+        matcher             = "200-399"
+      }
     }
   }
 
