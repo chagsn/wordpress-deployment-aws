@@ -22,23 +22,24 @@ module "alb" {
         target_group_key = "wordpress-tg"
       }
 
-    # http-https-redirect = {
-    #   port     = 80
-    #   protocol = "HTTP"
-    #   redirect = {
-    #     port        = "443"
-    #     protocol    = "HTTPS"
-    #     status_code = "HTTP_301"
-    #   }
-    # }
-    # https = {
-    #   port            = 443
-    #   protocol        = "HTTPS"
-    #   certificate_arn = "arn:aws:acm:eu-west-3:962480255828:certificate/85995d2a-5a2a-4023-a175-ea879c59a283"
+     http-https-redirect = {
+       port     = 80
+       protocol = "HTTP"
+       redirect = {
+         port        = "443"
+         protocol    = "HTTPS"
+         status_code = "HTTP_301"
+       }
+     }
+     https = {
+       port            = 443
+       protocol        = "HTTPS"
+       certificate_arn = "arn:aws:acm:eu-west-3:962480255828:certificate/cb002cc4-eef7-4f5a-9979-d2059c1a70a7"
 
-    #   forward = {
-    #     target_group_key = "wordpress-tg"
-    #   }
+       forward = {
+         target_group_key = "wordpress-tg"
+       }
+     }
     }
   }
 

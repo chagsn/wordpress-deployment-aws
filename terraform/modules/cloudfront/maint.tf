@@ -1,7 +1,7 @@
 module "cdn" {
   source = "terraform-aws-modules/cloudfront/aws"
 
-  aliases = ["cdn.stormpoei-web2.com"]
+  aliases = ["wordpress.stormpoei-web2.com"]
 
   comment             = "Web 2 CloudFront"
   enabled             = true
@@ -25,10 +25,9 @@ module "cdn" {
       domain_name = var.alb_dns_name
       custom_origin_config = {
         http_port              = 80
-        #https_port             = 443
-        origin_protocol_policy = "http-only" #"https-only"
-        #origin_ssl_protocols   = ["TLSv1", "TLSv1.1", "TLSv1.2"]
-        origin_ssl_protocols   = []
+        https_port             = 443
+        origin_protocol_policy = "https-only"
+        origin_ssl_protocols   = ["TLSv1", "TLSv1.1", "TLSv1.2"]
       }
     }
 
@@ -54,7 +53,7 @@ module "cdn" {
     {
       path_pattern           = "/static/*"
       target_origin_id       = "s3_one"
-      viewer_protocol_policy = "redirect-to-http" #"redirect-to-https"
+      viewer_protocol_policy = "redirect-to-https"
 
       allowed_methods = ["GET", "HEAD", "OPTIONS"]
       cached_methods  = ["GET", "HEAD"]
@@ -63,8 +62,11 @@ module "cdn" {
     }
   ]
 
-  #viewer_certificate = {
-  #  acm_certificate_arn = "arn:aws:acm:eu-west-3:962480255828:certificate/17f88fe7-9d25-4ab5-a261-6113e2ab33fc"
-  #  ssl_support_method  = "sni-only"
-  #}
+  viewer_certificate = {
+    acm_certificate_arn = "arn:aws:acm:eu-west-3:962480255828:certificate/cb002cc4-eef7-4f5a-9979-d2059c1a70a7"
+    ssl_support_method  = "sni-only"
+    region              = "eu-west-3"
+    #cloudfront_default_certificate = true
+    #minimum_protocol_version: "TLSv1"
+  }
 }
