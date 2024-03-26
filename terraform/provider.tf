@@ -5,7 +5,8 @@ terraform {
     profile = "terraform"
     bucket  = "projet-storm-web2-terraform-backend"
     key     = "terraform.tfstate"
-    region  = "eu-west-3" # la région ou se trouve le bucket
+    dynamodb_table = "projet-storm-web2-terraform-lock"
+    region  = "eu-west-3"
   }
 
   required_providers {
