@@ -58,35 +58,6 @@ resource "aws_security_group" "ecs_security_group" {
   }
 }
 
-
-# Configuration du security group pour les points de montage du système de fichiers EFS
-# resource "aws_security_group" "efs_security_group" {
-#   name        = "${var.env}-efs-sg"
-#   description = "Security group for EFS in ${var.env} environment"
-#   vpc_id      = var.vpc_id
-
-#   # Règle de trafic entrant: autorise le trafic entrant en provenance du security group du service ECS wordpress en NFS
-#   ingress {
-#     from_port   = 2049
-#     to_port     = 2049
-#     protocol    = "tcp"
-#     security_groups = [aws_security_group.ecs_security_group.id]
-#   }
-
-#   # Règle de trafic sortant: autorise le trafic sortant à destination du security group du service ECS wordpress en NFS
-#   egress {
-#     from_port   = 2049
-#     to_port     = 2049
-#     protocol    = "tcp"
-#     security_groups = [aws_security_group.ecs_security_group.id]
-#   }
-
-#   tags = {
-#     Terraform   = "true"
-#     Environment = var.env
-#   }
-# }
-
 # Configuration du security group pour la base de données RDS
 resource "aws_security_group" "db_security_group" {
   name        = "${var.env}-db-sg"
@@ -109,6 +80,14 @@ resource "aws_security_group" "db_security_group" {
     security_groups = [aws_security_group.ecs_security_group.id]
   }
 
+  # Règle de trafic sortant: autorise le trafic sortant vers toute destination en HTTPS (pour accès aux services AWS, e.g Cloudwatch)
+  egress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks       = ["0.0.0.0/0"]
+  }
+
   tags = {
     Terraform   = "true"
     Environment = var.env
@@ -117,9 +96,9 @@ resource "aws_security_group" "db_security_group" {
 
 # Configuration des règles ingress et egress pour le security group du service ECS wordpress
 
-# Autorisation du trafic avec l'ALB
+# Autorisation du trafic entrant en provenance de l'ALB en HTTP/HTTPS
 resource "aws_security_group_rule" "ecs_sg_ingress_rule_alb" {
-  description = "Security group ingress rules for ECS wordpress service: allow traffic FROM ALB"
+  description = "Security group ingress rules for ECS wordpress service: allow HTTP/HTTPS inbound traffic from ALB"
   for_each = toset(local.alb_sg_ports)
   type              = "ingress"
   from_port         = each.key
@@ -127,20 +106,19 @@ resource "aws_security_group_rule" "ecs_sg_ingress_rule_alb" {
   protocol          = "tcp"
   security_group_id = aws_security_group.ecs_security_group.id
   # Test
-  # source_security_group_id = aws_security_group.alb_security_group.id
-  cidr_blocks       = ["0.0.0.0/0"]
+  source_security_group_id = aws_security_group.alb_security_group.id
+  # cidr_blocks       = ["0.0.0.0/0"]
 }
 
+# Autorisation du trafic sortant en HTTP/HTTPS (pour accès au repo wordpress sur ECR Public Gallery et aux aux services AWS, e.g Cloudwatch, Secrets Manager)
 resource "aws_security_group_rule" "ecs_sg_egress_rule_alb" {
-  description = "Security group egress rules for ECS wordpress service: allow traffic TO ALB"
+  description = "Security group egress rules for ECS wordpress service: allow HTTP/HTTPS outbound traffic to anywhere"
   for_each = toset(local.alb_sg_ports)
   type              = "egress"
   from_port         = each.key
   to_port           = each.key
   protocol          = "tcp"
   security_group_id = aws_security_group.ecs_security_group.id
-  # Test
-  # source_security_group_id = aws_security_group.alb_security_group.id
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
