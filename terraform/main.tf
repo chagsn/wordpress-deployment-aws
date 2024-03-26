@@ -51,6 +51,25 @@ module "efs" {
   wordpress_subnet_ids  = module.networking.wordpress_subnet_ids
 }
 
+module "cloudfront" {
+  source = "./modules/cloudfront"
+  alb_dns_name = module.alb.alb_dns_name
+  S3_logs_dns = module.s3.S3_logs_dns
+  S3_one_regional_dns = module.s3.S3_one_regional_dns
+}
+
+module "s3" {
+  source = "./modules/bucket"
+}
+
+module "route53" {
+  source = "./modules/route53"
+  cloudfront_dns = module.cloudfront.cloudfront_dns
+  cloudfront_id = module.cloudfront.cloudfront_id
+  subdomain = var.subdomain
+  domain_name = var.domain_name
+}
+
 module "rds" {
   source            = "./modules/database_rds"
   vpc_db_group      = module.networking.database_subnet_group
@@ -59,4 +78,3 @@ module "rds" {
   db_username       = var.db_username
   db_password       = var.db_password
 }
-

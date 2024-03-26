@@ -1,7 +1,7 @@
 module "s3_bucket_for_logs" {
   source = "terraform-aws-modules/s3-bucket/aws"
 
-  bucket = "my-s3-bucket-for-logs-storm_poei"
+  bucket = "my-s3-bucket-for-logs-storm-poei"
   acl    = "log-delivery-write"
 
   # Allow deletion of non-empty bucket
@@ -17,7 +17,7 @@ module "s3_bucket_for_logs" {
 module "s3_one" {
   source = "terraform-aws-modules/s3-bucket/aws"
 
-  bucket = "my-s3-bucket-for-storm_poei-web2"
+  bucket = "my-s3-bucket-for-storm-poei-web2"
 
   control_object_ownership = true
   object_ownership         = "ObjectWriter"

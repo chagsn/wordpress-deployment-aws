@@ -79,10 +79,20 @@ variable "wordpress_image" {
   }
 }
 
+
 # ALB configuration
 variable "alb_health_check_path" {
   description = "URI used by the ALB to check wordpress application health"
   type        = string
   default     = "/wp-load.php"
+
+variable "domain_name" {
+  type = string
+  default = "stormpoei-web2.com"
+}
+
+variable "subdomain" {
+  type = string
+  default = "Wordpress"
 
 }
