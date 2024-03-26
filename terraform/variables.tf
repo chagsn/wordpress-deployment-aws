@@ -36,19 +36,20 @@ variable "database_subnets_cidr" {
 }
 
 # Database informations
-variable "db_name" {
-  type    = string
-  default = "wordpress" # A modifier après intégration du module SecretsManager
-}
-
 variable "db_username" {
-  type    = string
-  default = "wp_user" # A modifier après intégration du module SecretsManager
+  description = "RDS database username"
+  type        = string
+  default     = "stormpoeiweb2"
 }
-
-variable "db_password" {
-  type    = string
-  default = "supersecretpassword" # A modifier après intégration du module SecretsManager
+variable "db_name" {
+  description = "RDS database name"
+  type        = string
+  default     = "wordpress"
+}
+variable "db_password_automatic_rotation_schedule" {
+  description = "Number of days between automatic scheduled rotations of the secret containing the DB password"
+  type        = number
+  default     = 30
 }
 
 # ECS configuration

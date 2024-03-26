@@ -2,11 +2,11 @@ terraform {
 
   # Remote backend
   backend "s3" {
-    profile = "terraform"
-    bucket  = "projet-storm-web2-terraform-backend"
-    key     = "terraform.tfstate"
+    profile        = "terraform"
+    bucket         = "projet-storm-web2-terraform-backend"
+    key            = "terraform.tfstate"
     dynamodb_table = "projet-storm-web2-terraform-lock"
-    region  = "eu-west-3"
+    region         = "eu-west-3"
   }
 
   required_providers {
