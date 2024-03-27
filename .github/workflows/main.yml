@@ -55,6 +55,10 @@ jobs:
         if: github.event_name == 'pull_request'
         continue-on-error: true
 
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply -auto-approve
+
       - uses: actions/github-script@v6
         if: github.event_name == 'pull_request'
         env:
@@ -82,6 +86,12 @@ jobs:
             ${{ steps.plan.outputs.stdout }}
             \`\`\`
 
+            #### Terraform applylan 📖\`${{ steps.apply.outcome }}\`
+
+            \`\`\`\n
+            ${{ steps.apply.outputs.stdout }}
+            \`\`\`
+
             </details>
 
             *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
@@ -92,12 +102,3 @@ jobs:
               repo: context.repo.repo,
               body: output
             })
-
-      - name: Terraform Plan Status
-        if: steps.plan.outcome == 'failure'
-        run: exit 1
-
-      - name: Terraform Apply
-        id: apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve -input=false
