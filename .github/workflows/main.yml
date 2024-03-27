@@ -79,6 +79,7 @@ jobs:
 
             \`\`\`\n
             ${process.env.PLAN}
+            ${{ steps.plan.outputs.stdout }}
             \`\`\`
 
             </details>
@@ -91,6 +92,10 @@ jobs:
               repo: context.repo.repo,
               body: output
             })
+
+      - name: Terraform Plan Status
+         if: steps.plan.outcome == 'failure'
+         run: exit 1
 
       - name: Terraform Apply
         id: apply
