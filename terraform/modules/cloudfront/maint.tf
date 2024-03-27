@@ -1,7 +1,7 @@
 module "cdn" {
   source = "terraform-aws-modules/cloudfront/aws"
 
-  aliases = ["cdn.stormpoei-web2.com"]
+  #aliases = ["stormpoei-web2.com"]
 
   comment             = "Web 2 CloudFront"
   enabled             = true
@@ -26,8 +26,9 @@ module "cdn" {
       custom_origin_config = {
         http_port              = 80
         https_port             = 443
-        origin_protocol_policy = "https-only"
+        origin_protocol_policy = "http-only"
         origin_ssl_protocols   = ["TLSv1", "TLSv1.1", "TLSv1.2"]
+        #origin_ssl_protocols   = []
       }
     }
 
@@ -53,7 +54,7 @@ module "cdn" {
     {
       path_pattern           = "/static/*"
       target_origin_id       = "s3_one"
-      viewer_protocol_policy = "redirect-to-https"
+      viewer_protocol_policy = "allow-all"
 
       allowed_methods = ["GET", "HEAD", "OPTIONS"]
       cached_methods  = ["GET", "HEAD"]
@@ -62,8 +63,12 @@ module "cdn" {
     }
   ]
 
-  viewer_certificate = {
-    acm_certificate_arn = "arn"
-    ssl_support_method  = "sni-only"
-  }
+  #viewer_certificate = {
+  #  acm_certificate_arn            = lookup(var.viewer_certificate, "acm_certificate_arn", null)
+  #  cloudfront_default_certificate = lookup(var.viewer_certificate, "cloudfront_default_certificate", null)
+  #  iam_certificate_id             = lookup(var.viewer_certificate, "iam_certificate_id", null)
+#
+  #  minimum_protocol_version = lookup(var.viewer_certificate, "minimum_protocol_version", "TLSv1")
+  #  ssl_support_method       = lookup(var.viewer_certificate, "ssl_support_method", null)
+  #}
 }
