@@ -3,7 +3,6 @@ locals {
   efs_volume_name = "wordpress-efs-volume"
 }
 
-
 # Configuration du cluster ECS
 module "wordpress-cluster" {
   source  = "terraform-aws-modules/ecs/aws//modules/cluster"
@@ -68,6 +67,9 @@ module "wordpress-service" {
   autoscaling_min_capacity = var.autoscaling_range["min_capacity"]
   autoscaling_max_capacity = var.autoscaling_range["max_capacity"]
 
+  # Adding Secrets manager permissions to the task execution role to allow to get/read RDS database password
+  task_exec_secret_arns = [var.rds_db_data["password_secret_arn"]]
+  
   # Adding EFS mounting permissions to the default task role created by Terraform
   tasks_iam_role_policies = {
     efsmounting = aws_iam_policy.task_role_mountefs_policy.arn
@@ -85,19 +87,22 @@ module "wordpress-service" {
       environment = [
         {
             name = "WORDPRESS_DB_HOST"
-            value = "${var.rds_database["db_address"]}"
+            value = "${var.rds_db_data["address"]}"
         },
         {
             name = "WORDPRESS_DB_USER"
-            value = "${var.rds_database["db_username"]}"
-        },
-        {
-            name = "WORDPRESS_DB_PASSWORD"
-            value = "${var.rds_database["db_password"]}"
+            value = "${var.rds_db_data["username"]}"
         },
         {
             name = "WORDPRESS_DB_NAME"
-            value = "${var.rds_database["db_name"]}"
+            value = "${var.rds_db_data["db_name"]}"
+        }
+
+      ]
+      secrets = [
+        {
+            name = "WORDPRESS_DB_PASSWORD"
+            valueFrom = "${var.rds_db_data["password_secret_arn"]}:password::"
         }
       ]
       port_mappings = [
@@ -155,8 +160,6 @@ module "wordpress-service" {
     }
   ]
 
-  task_exec_secret_arns = []
-  
   tags = {
     Terraform = "true"
     Environment = "${var.env}"

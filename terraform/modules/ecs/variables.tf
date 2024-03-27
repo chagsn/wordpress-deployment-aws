@@ -42,7 +42,8 @@ variable "wordpress_image" {
   type = map(string)
 }
 
-variable "rds_database" {
-  description = "RDS database outputs: {db_address,db_username,db_password,db_name}"
+variable "rds_db_data" {
+  description = "RDS database data: address, username, database name, and ARN of the secret created in Secrets Manager containing the DB password "
   type = map(string)
 }
+
