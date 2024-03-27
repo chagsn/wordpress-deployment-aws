@@ -9,8 +9,8 @@ module "records" {
       name = var.subdomain
       type = "A"
       alias = {
-        name    = var.alb_dns_name
-        zone_id = var.alb_id
+        name    = var.cloudfront_dns
+        zone_id = var.cloudfront_id
       }
     },
   ]

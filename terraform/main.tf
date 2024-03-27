@@ -64,10 +64,8 @@ module "s3" {
 
 module "route53" {
   source = "./modules/route53"
-  #cloudfront_dns = module.cloudfront.cloudfront_dns
-  #cloudfront_id = module.cloudfront.cloudfront_id
-  alb_dns_name = module.cloudfront.cloudfront_dns
-  alb_id = module.cloudfront.cloudfront_id
+  cloudfront_dns = module.cloudfront.cloudfront_dns
+  cloudfront_id = module.cloudfront.cloudfront_id
   subdomain = var.subdomain
   domain_name = var.domain_name
 }
