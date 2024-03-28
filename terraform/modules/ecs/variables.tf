@@ -33,7 +33,7 @@ variable "efs_id" {
   type = string
 }
 variable "efs_arn" {
-  description = "ID of the shared EFS to mount on containers for persistent wordpress data storage"
+  description = "ARN of the shared EFS to mount on containers for persistent wordpress data storage"
   type = string
 }
 
