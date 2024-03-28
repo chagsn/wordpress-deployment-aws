@@ -72,11 +72,14 @@ module "wordpress-service" {
   
   # Adding EFS mounting permissions to the default task role created by Terraform
   tasks_iam_role_policies = {
-    efsmounting = aws_iam_policy.task_role_mountefs_policy.arn
+    efsmounting = "${aws_iam_policy.task_role_mountefs_policy.arn}"
   }
+  
+  # Taking into account task definition changes
+  ignore_task_definition_changes = false
 
-  # Enabling Exec command to be able to execute commands on containers
-  enable_execute_command = true
+  # Enabling Exec command to be able to execute commands on containers in dev environment only
+  enable_execute_command = var.env=="dev" ? true : false
 
   # Container definition
   container_definitions = {
@@ -97,7 +100,6 @@ module "wordpress-service" {
             name = "WORDPRESS_DB_NAME"
             value = "${var.rds_db_data["db_name"]}"
         }
-
       ]
       secrets = [
         {
@@ -105,17 +107,21 @@ module "wordpress-service" {
             valueFrom = "${var.rds_db_data["password_secret_arn"]}:password::"
         }
       ]
+      # health_check = {
+      #   command = ["CMD-SHELL", "curl -f http://localhost:${local.container_port}/health || exit 1"]
+      # }
+      health_check = {
+          # command = ["CMD-SHELL", "curl", "-f", "http://localhost:80 || exit 1"]
+          command = ["CMD-SHELL", "curl -Lf http://localhost:80 || exit 1"]
+          interval = 30
+          timeout  = 15
+          retries  = 3
+      }
       port_mappings = [
         {
           name          = "http"
           containerPort = 80
           protocol      = "tcp"
-        # },
-        # {
-        #   name          = "https"
-        #   containerPort = 443
-        #   protocol      = "tcp"
-        # },
         }
       ]
       # Il faudra vérifier si l'image wordpress requiert l'accès en écriture au root filesystem
