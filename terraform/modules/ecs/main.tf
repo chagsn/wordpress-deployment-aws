@@ -149,6 +149,7 @@ module "wordpress-service" {
   # Load balancer health_checks configuration
   health_check_grace_period_seconds = 30
 
+
   # Network configuration
   network_mode = "awsvpc"
   subnet_ids = var.wordpress_subnet_ids
