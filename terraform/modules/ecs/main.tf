@@ -1,9 +1,12 @@
-# Local variable: EFS-storage volume name
+# Local variables: EFS-storage volume name
 locals {
+  # EFS-storage volume name
   efs_volume_name = "wordpress-efs-volume"
+  # Container listening port
+  container_port = 80
 }
 
-# Configuration du cluster ECS
+# Configuration of ECS cluster
 module "wordpress-cluster" {
   source  = "terraform-aws-modules/ecs/aws//modules/cluster"
   version = "5.10.0"
@@ -15,12 +18,12 @@ module "wordpress-cluster" {
   fargate_capacity_providers = {
     FARGATE = {
       default_capacity_provider_strategy = {
-        weight = var.capacity_provider_strategy["FARGATE"]
+        weight = "${var.capacity_provider_strategy["FARGATE"]}"
       }
     }
     FARGATE_SPOT = {
       default_capacity_provider_strategy = {
-        weight = var.capacity_provider_strategy["FARGATE_SPOT"]
+        weight = "${var.capacity_provider_strategy["FARGATE_SPOT"]}"
       }
     }
   }
@@ -32,7 +35,7 @@ module "wordpress-cluster" {
 
 }
 
-# Création d'une policy pour le Task role autorisant le montage des mount targets de l'EFS
+# Creation of a policy for the Task role allowing to mount EFS mount targets
 resource "aws_iam_policy" "task_role_mountefs_policy" {
   description = "Allows to mount EFS mount targets and access to file system root"
   policy = jsonencode({
@@ -51,7 +54,7 @@ resource "aws_iam_policy" "task_role_mountefs_policy" {
   })
 }
 
-# Configuration du service ECS déployant les Tasks
+# Configuration of ECS service
 module "wordpress-service" {
   source  = "terraform-aws-modules/ecs/aws//modules/service"
   version = "5.10.0"
@@ -59,9 +62,9 @@ module "wordpress-service" {
   name        = "${var.env}-wordpress-service"
   cluster_arn = module.wordpress-cluster.id
 
-  # CPU and memeory sizing
-  cpu    = 1024
-  memory = 4096
+  # CPU and memory sizing of the wordprress containers
+  cpu    = var.containers_sizing["cpu"]
+  memory = var.containers_sizing["memory"]
 
   # Autoscaling configuration
   autoscaling_min_capacity = var.autoscaling_range["min_capacity"]
@@ -70,7 +73,7 @@ module "wordpress-service" {
   # Adding Secrets manager permissions to the task execution role to allow to get/read RDS database password
   task_exec_secret_arns = [var.rds_db_data["password_secret_arn"]]
   
-  # Adding EFS mounting permissions to the default task role created by Terraform
+  # Adding EFS mounting permissions to the default Task role created by Terraform
   tasks_iam_role_policies = {
     efsmounting = "${aws_iam_policy.task_role_mountefs_policy.arn}"
   }
@@ -81,12 +84,15 @@ module "wordpress-service" {
   # Enabling Exec command to be able to execute commands on containers in dev environment only
   enable_execute_command = var.env=="dev" ? true : false
 
+  #############################################################################################
   # Container definition
   container_definitions = {
     wordpress = {
       name = "${var.env}-wordpress-container"
       essential = true
       image     = "${var.wordpress_image["repo_url"]}:${var.wordpress_image["image_tag"]}"
+
+      # Environment variables to pass to the container
       environment = [
         {
             name = "WORDPRESS_DB_HOST"
@@ -101,49 +107,53 @@ module "wordpress-service" {
             value = "${var.rds_db_data["db_name"]}"
         }
       ]
+
+      # Secret to retrieve from Secrets Manager: database password 
       secrets = [
         {
             name = "WORDPRESS_DB_PASSWORD"
             valueFrom = "${var.rds_db_data["password_secret_arn"]}:password::"
         }
       ]
-      # health_check = {
-      #   command = ["CMD-SHELL", "curl -f http://localhost:${local.container_port}/health || exit 1"]
-      # }
+
+      # Health checks
       health_check = {
-          # command = ["CMD-SHELL", "curl", "-f", "http://localhost:80 || exit 1"]
-          command = ["CMD-SHELL", "curl -Lf http://localhost:80 || exit 1"]
+          command = ["CMD-SHELL", "curl -Lf http://localhost:${local.container_port} || exit 1"]
           interval = 30
           timeout  = 15
           retries  = 3
       }
+
       port_mappings = [
         {
           name          = "http"
-          containerPort = 80
+          containerPort = local.container_port
           protocol      = "tcp"
         }
       ]
+
       # Il faudra vérifier si l'image wordpress requiert l'accès en écriture au root filesystem
       readonly_root_filesystem = false  
       
-      # Mounting points to EFS storage
+      # Mounting points to EFS volume
       mount_points = [
         {
         containerPath = "/var/www/web"
-        sourceVolume  = local.efs_volume_name
+        sourceVolume  = "${local.efs_volume_name}"
         readOnly      = false
         }
       ]
     }
   }
+ # Enf of container definition
+ #############################################################################################
 
   # Attachement to load balancer target group
   load_balancer = {
     alb = {
-      target_group_arn = var.alb_target_group_id
+      target_group_arn = "${var.alb_target_group_id}"
       container_name   = "${var.env}-wordpress-container"
-      container_port   = 80
+      container_port   = local.container_port
     }
   }
   # Load balancer health_checks configuration
@@ -159,9 +169,9 @@ module "wordpress-service" {
   # EFS volume attachment configuration
   volume = [
     {
-      name = local.efs_volume_name
+      name = "${local.efs_volume_name}"
       efs_volume_configuration = {
-        file_system_id = var.efs_id
+        file_system_id = "${var.efs_id}"
       }
     }
   ]

@@ -17,9 +17,8 @@ terraform {
   }
 }
 
-# Configure the AWS Provider
-#provider "aws" {
-#  profile = "terraform"
-#  region  = "eu-west-3"
-#}
-#
+# AWS Provider in deployment region (eu-west-3)
+provider "aws" {
+  profile = "terraform"
+  region  = "eu-west-3"
+}

@@ -4,20 +4,20 @@ variable "env" {
 }
 
 variable "vpc_id" {
-  description = "ID du VPC"
+  description = "ID of VPC"
   type        = string
 }
 
 variable "public_subnets_ids" {
-  description = "List of ids for the public subnets"
+  description = "List of IDs for the public subnets"
   type        = list(string)
 }
 
 variable "alb_security_group_id" {
-  description = "ID du security group de l'ALB"
+  description = "ID of ALB security group"
   type        = string
 }
  variable "health_check_path" {
-  description = "URI de destination des health checks effectués par le load balancer sur l'appli wordpress"
+  description = "Destination URI for the target group health checks"
   type = string
  }
