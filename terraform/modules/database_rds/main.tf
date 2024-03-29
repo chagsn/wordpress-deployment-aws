@@ -3,17 +3,23 @@
 module "db" {
   source = "terraform-aws-modules/rds/aws"
   version = "6.5.4"
+
   identifier = "${var.env}-${var.db_name}"
 
-  engine                 = "mysql"
-  engine_version         = "8.0"
-  family                 = "mysql8.0"
-  major_engine_version   = "8.0"
-  instance_class         = "db.t3.small"
+  # Engine configuration
+  engine                 = var.db_engine["engine"]
+  engine_version         = var.db_engine["engine_version"]
+  family                 = var.db_engine["family"]
+  major_engine_version   = var.db_engine["major_engine_version"]
+  
+  # Database instance class
+  instance_class         = var.db_instance_class
 
-  allocated_storage      = 20
-  max_allocated_storage  = 100
+  # Database storage sizing
+  allocated_storage      = var.db_storage_sizing["allocated_storage"]
+  max_allocated_storage  = var.db_storage_sizing["max_allocated_storage"]
 
+  # Database name, username and password
   db_name  = "${var.db_name}"
   username = "${var.db_username}"
   # Database password is created and managed by the present module
@@ -23,21 +29,20 @@ module "db" {
   
   port     = 3306
 
-  # No encryption of the database
+  # No encryption
   storage_encrypted = false
 
   # Multi-AZ configuration
-  multi_az               = true
+  multi_az = true
 
   # DB subnet group
   db_subnet_group_name   = var.vpc_db_group
   vpc_security_group_ids = [var.security_group_id]
 
-  # Maintenance configuration
-  maintenance_window = "Mon:00:00-Mon:03:00"
-  backup_window = "03:00-06:00"
+  # Maintenance window
+  maintenance_window = var.db_maintenance_window
 
-  # CloudWatch logs
+  # CloudWatch monitoring
   enabled_cloudwatch_logs_exports = ["general"]
   create_cloudwatch_log_group     = true
 
@@ -51,7 +56,7 @@ module "db" {
   # Disable database Deletion Protection
   deletion_protection = false
 
-
+  # MySQL parameters: character set
   parameters = [
     {
       name  = "character_set_client"
@@ -63,6 +68,7 @@ module "db" {
     }
   ]
 
+  # Add MariaDB Audit plugin to record connections to database
   options = [
     {
       option_name = "MARIADB_AUDIT_PLUGIN"
