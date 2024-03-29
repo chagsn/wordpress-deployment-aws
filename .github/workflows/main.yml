@@ -36,26 +36,22 @@ jobs:
         with:
           terraform_version: 1.7.4
 
-      - name: Cd terraform
-        id: cd
-        run: cd terraform
-
       - name: Terraform fmt
         id: fmt
-        run: terraform fmt -check
+        run: terraform -chdir=terraform fmt -check
         continue-on-error: true
 
       - name: Terraform Init
         id: init
-        run: terraform init
+        run: terraform -chdir=terraform init
 
       - name: Terraform Validate
         id: validate
-        run: terraform validate -no-color
+        run: terraform -chdir=terraform validate -no-color
 
       - name: Terraform Plan
         id: plan
-        run: terraform apply --auto-approve
+        run: terraform -chdir=terraform apply --auto-approve
         if: github.event_name == 'pull_request'
         continue-on-error: true
 
@@ -66,8 +62,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `#### Navigate into terraform directory \`${{ steps.cd.outcome }}\`
-            #### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
             #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
             #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
             <details><summary>Validation Output</summary>
@@ -104,4 +99,4 @@ jobs:
       - name: Terraform Apply
         id: apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve -input=false
+        run: terraform -chdir=terraform apply -auto-approve -input=false

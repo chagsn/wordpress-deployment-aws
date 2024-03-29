@@ -60,6 +60,7 @@ module "cloudfront" {
 
 module "s3" {
   source = "./modules/bucket"
+  env                                     = var.env
 }
 
 module "route53" {
