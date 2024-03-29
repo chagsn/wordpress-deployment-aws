@@ -50,10 +50,9 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        run: terraform -chdir=terraform plan -out
+        run: terraform -chdir=terraform plan -out infra_plan.out
         env:
           TF_WORKSPACE: dev
-        if: github.event_name == 'pull_request'
         continue-on-error: true
 
       - uses: actions/github-script@v6
@@ -100,6 +99,6 @@ jobs:
       - name: Terraform Apply
         id: apply
         if: github.event_name == 'push'
-        run: terraform -chdir=terraform apply -auto-approve -input=false
+        run: terraform -chdir=terraform apply "infra_plan.out"
         env:
           TF_WORKSPACE: dev
