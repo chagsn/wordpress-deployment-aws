@@ -19,6 +19,6 @@ terraform {
 
 # Configure the AWS Provider
 provider "aws" {
-  profile = "terraform"
+  #profile = "terraform"
   region  = "eu-west-3"
 }
