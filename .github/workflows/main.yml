@@ -25,11 +25,11 @@ jobs:
       - name: Configure AWS credentials from AWS account
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          #aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          #aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
-          role-to-assume: ${{ secrets.AWS_ROLE }}
-          role-session-name: GitHub-OIDC-TERRAFORM
+          #role-to-assume: ${{ secrets.AWS_ROLE }}
+          #role-session-name: GitHub-OIDC-TERRAFORM
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
@@ -51,7 +51,7 @@ jobs:
 
       - name: Terraform Plan
         id: plan
-        run: terraform -chdir=terraform plan
+        run: terraform -chdir=terraform plan 
         if: github.event_name == 'pull_request'
         continue-on-error: true
 
