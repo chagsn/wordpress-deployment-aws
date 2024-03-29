@@ -60,7 +60,53 @@ variable "database_subnets_cidr" {
   }
 }
 
-# Database informations
+# Database configuration
+variable "db_engine" {
+  description = "Engine configuration for the database:{engine,engine_version,family,major_engine_version}"
+  type        = map(string)
+  default = {
+    engine               = "mysql"
+    engine_version       = "8.0"
+    family               = "mysql8.0"
+    major_engine_version = "8.0"
+  }
+}
+
+variable "db_instance_class" {
+  description = "Instance class of the database"
+  type        = map(string)
+  default = {
+    default = "db.t3.small"
+    dev     = "db.t3.small"
+    prod    = "db.t3.large"
+  }
+}
+
+variable "db_storage_sizing" {
+  description = "Storage sizing of the database"
+  type        = map(map(number))
+  default = {
+    default = {
+      allocated_storage     = 20
+      max_allocated_storage = 100
+    }
+    dev = {
+      allocated_storage     = 20
+      max_allocated_storage = 100
+    }
+    prod = {
+      allocated_storage     = 30
+      max_allocated_storage = 150
+    }
+  }
+}
+
+variable "db_maintenance_window" {
+  description = "Window to perform database maintenance"
+  type        = string
+  default     = "Mon:00:00-Mon:03:00"
+}
+
 variable "db_username" {
   description = "RDS database username"
   type        = string
@@ -125,6 +171,24 @@ variable "wordpress_image" {
   }
 }
 
+variable "wordpress_containers_sizing" {
+  description = "CPU and memory sizing for wordpress containers: {cpu, memory}"
+  type        = map(map(number))
+  default = {
+    default = {
+      cpu    = 512
+      memory = 2048
+    }
+    dev = {
+      cpu    = 512
+      memory = 2048
+    }
+    prod = {
+      cpu    = 1024
+      memory = 4096
+    }
+  }
+}
 
 # ALB configuration
 variable "alb_health_check_path" {
@@ -134,12 +198,12 @@ variable "alb_health_check_path" {
 }
 
 variable "domain_name" {
-  type = string
+  type    = string
   default = "stormpoei-web2.com"
 }
 
 variable "subdomain" {
-  type = string
+  type    = string
   default = "Wordpress"
 
 }

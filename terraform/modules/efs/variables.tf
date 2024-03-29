@@ -4,12 +4,12 @@ variable "env" {
 }
 
 variable "vpc_id" {
-  description = "ID du VPC"
+  description = "ID of VPC"
   type        = string
 }
 
 variable "ecs_security_group_id" {
-  description = "ECS wordpress service security group id"
+  description = "ECS wordpress service security group ID"
   type = string
 }
 

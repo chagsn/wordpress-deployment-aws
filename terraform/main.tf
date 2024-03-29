@@ -42,6 +42,7 @@ module "ecs" {
   efs_id                     = module.efs.efs_id
   efs_arn                    = module.efs.efs_arn
   wordpress_image            = var.wordpress_image
+  containers_sizing          = lookup(var.wordpress_containers_sizing, local.env)
   rds_db_data = {
     address             = module.rds.db_address
     username            = var.db_username
@@ -62,11 +63,15 @@ module "rds" {
 
   source                                  = "./modules/database_rds"
   env                                     = local.env
-  vpc_db_group                            = module.networking.database_subnet_group
-  security_group_id                       = module.security_group.db_security_group_id
+  db_engine                               = var.db_engine
+  db_instance_class                       = lookup(var.db_instance_class, local.env)
+  db_storage_sizing                       = lookup(var.db_storage_sizing, local.env)
+  db_maintenance_window                   = var.db_maintenance_window
   db_name                                 = var.db_name
   db_username                             = var.db_username
   db_password_automatic_rotation_schedule = var.db_password_automatic_rotation_schedule
+  vpc_db_group                            = module.networking.database_subnet_group
+  security_group_id                       = module.security_group.db_security_group_id
 }
 
 module "bucket" {

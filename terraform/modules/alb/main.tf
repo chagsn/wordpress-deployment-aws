@@ -53,7 +53,7 @@ module "alb" {
       create_attachment = false
       health_check = {
         interval            = 30
-        path                = var.health_check_path
+        path                = "${var.health_check_path}"
         port                = "traffic-port"
         healthy_threshold   = 2
         unhealthy_threshold = 3

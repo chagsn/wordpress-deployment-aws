@@ -58,7 +58,7 @@ resource "aws_backup_plan" "backup_plan" {
   }
 }
 
-# Selection of the resources to be backup up
+# Selection of the resources to be backup up: RDS database and EFS wordpress shared storage
 resource "aws_backup_selection" "backup_selection" {
   iam_role_arn = aws_iam_role.backup_role.arn
   name         = "${var.env}-backup-selection"
@@ -67,6 +67,6 @@ resource "aws_backup_selection" "backup_selection" {
   resources = [
     var.rds_db_arn,          # RDS Wordpress database
     var.efs_arn,             # Wordpress EFS shared storage
-    var.s3_bucket_arn        # Wordpress static content s3 bucket
+    # var.s3_bucket_arn        # Wordpress static content s3 bucket
   ]
 }
