@@ -20,13 +20,18 @@ def test_ecs_tasks_status():
     print("Checking ECS Task status...")
     tasks_status = get_ecs_tasks_status(ecs_cluster_arn)
     for task in tasks_status:
-        assert task['Task status'] == 'RUNNING', "Task is not running!"
-        assert task['Task health status'] == 'HEALTHY', "Task is not healthy!"
+        assert task['Task status'] == 'RUNNING', f"ECS Task status is {task['Task status']}"
+        print("ECS Task is running")
+        assert task['Task health status'] == 'HEALTHY', f"ECS Task status is {task['Task health status']}"
+        print("ECS Task is healthy")
 
 def test_rds_database_config():
     print("Checking RDS database status and configuration...")
     rds_config = get_rds_database_config(rds_database_arn)
-    assert rds_config['Database instance status'] == 'available', "Database is not available!"
-    assert rds_config['Multi-AZ'] == True, "Database is not Multi-AZ!"
-    assert rds_config['Publicly accessible'] == False, "Database is publicly accessible!"
+    assert rds_config['Database instance status'] == 'available', f"Database status is {rds_config['Database instance status']}"
+    print("Database is available")
+    assert rds_config['Multi-AZ'] == True, "Database is NOT Multi-AZ"
+    print("Database is Multi-AZ")
+    assert rds_config['Publicly accessible'] == False, "Database is PUBLICLY accessible"
+    print("Database is not publicly accessible")
 
