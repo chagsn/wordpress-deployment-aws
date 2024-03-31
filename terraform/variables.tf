@@ -197,13 +197,15 @@ variable "alb_health_check_path" {
   default     = "/wp-load.php"
 }
 
+# Route 53 configuration
 variable "domain_name" {
-  type    = string
-  default = "stormpoei-web2.com"
+  description = "Hosted zone name"
+  type        = string
+  default     = "stormpoei-web2.com"
 }
 
-variable "subdomain" {
-  type    = string
-  default = "Wordpress"
-
+variable "subdomain_name" {
+  description = "Subdomain name for wordpress website"
+  type        = string
+  default     = "wordpress"
 }
