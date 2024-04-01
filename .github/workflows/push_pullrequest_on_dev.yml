@@ -75,7 +75,7 @@ jobs:
                 soft_fail: true
   
   Build:
-    name: Build the plan binary file for dev
+    name: Build Terraform plan for dev
     needs: [Validate,Test-policy]
     runs-on: ubuntu-latest
     defaults:
