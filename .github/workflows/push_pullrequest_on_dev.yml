@@ -160,7 +160,7 @@ jobs:
           
   Deploy:
     name: Deploy infrastructure in dev
-    needs: [Build]
+    # needs: [Build]
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -187,20 +187,23 @@ jobs:
          id: init
          run: terraform -chdir=terraform init
 
-       - name: Download artifact for deployment
-         uses: actions/download-artifact@v3
-         with:
-           name: ${{ env.TF_WORKSPACE }}-terraform-plan
-           path: ./terraform/
-           if-no-files-found: error
+      #  - name: Download artifact for deployment
+      #    uses: actions/download-artifact@v3
+      #    with:
+      #      name: ${{ env.TF_WORKSPACE }}-terraform-plan
+      #      path: ./terraform/
+      #      if-no-files-found: error
   
-       - name: Terraform apply
-         id: apply
-         run: terraform -chdir=terraform apply $tfplan_artifact_name
+      #  - name: Terraform apply
+      #    id: apply
+      #    run: terraform -chdir=terraform apply $tfplan_artifact_name
 
        - name: Terraform output
          id: output
          run: terraform -chdir=terraform output > $tfoutput_artifact_name
+      
+       - name: Test terraform output creation
+         run: ls -l ./terraform
 
        - name: Upload terraform output artifact for tests
          uses: actions/upload-artifact@v3
@@ -264,7 +267,27 @@ jobs:
           verbose: true
           job-summary: true
 
-      
+  # Destroy:
+  #   name: Terraform destroy (manual approval)
+  #   needs: [Deploy]
+  #   runs-on: ubuntu-latest
+  #   defaults:
+  #     run:
+  #       shell: bash
+  #       working-directory: .
+  
+  #   steps:
+  #     - name: Manual approval for destroy
+  #       uses: macnev2013/manual-approval@latest
+  #       with:
+  #         # secret: ${{ github.TOKEN }}
+  #         # approvers: user1,user2
+  #         minimum-approvals: 1
+  #         approval-wait: 600
+  #         issue-title: 'Manual Approval for destroying dev infa'
+  #         issue-body: |
+  #           "Do you approve to apply terraform destroy on dev deployment? Answer "
+               
  
 
 
