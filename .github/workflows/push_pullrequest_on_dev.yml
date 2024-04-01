@@ -105,7 +105,7 @@ jobs:
 
       - name: Terraform plan
         id: plan
-        run: terraform -chdir=terraform plan -out $tfplan-artifact_name
+        run: terraform -chdir=terraform plan -out $tfplan_artifact_name
         # if: github.event_name == 'pull_request'
         continue-on-error: true
 
@@ -246,12 +246,20 @@ jobs:
           if-no-files-found: error
  
       - name: Rename artifact for tests
-        run: mv pytests/$tfoutput-artifact_name pytest/terraform_output.py
+        run: mv pytests/$tfoutput_artifact_name pytest/terraform_output.py
 
-      - name: Run pytest
+      - name: Run pytest to test infrastructure
         uses: pavelzw/pytest-action@v2
         with:
-          custom-arguments: 'test_check_wordpress.py'
+          custom-arguments: 'test_wordpress_infra_for_pipeline.py'
+          emoji: true
+          verbose: true
+          job-summary: true
+
+      - name: Run pytest to test webiste url
+        uses: pavelzw/pytest-action@v2
+        with:
+          custom-arguments: 'test_wordpress_url.py'
           emoji: true
           verbose: true
           job-summary: true

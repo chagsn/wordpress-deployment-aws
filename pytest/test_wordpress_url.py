@@ -11,6 +11,7 @@ def test_check_request_status_code():
     Try to connect to wordpress website domain name and check returned status code
     Test passes if:
         - GET request to website URL is successful
+        AND
         - Returned status code is 200 (allowing for redirects)
     If request is not successful a System Exit is raised and the test fails.
     """
