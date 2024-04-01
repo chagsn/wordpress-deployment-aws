@@ -160,7 +160,7 @@ jobs:
           
   Deploy:
     name: Deploy infrastructure in dev
-    # needs: [Build]
+    needs: [Build]
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -187,20 +187,20 @@ jobs:
          id: init
          run: terraform -chdir=terraform init
 
-      #  - name: Download artifact for deployment
-      #    uses: actions/download-artifact@v3
-      #    with:
-      #      name: ${{ env.TF_WORKSPACE }}-terraform-plan
-      #      path: ./terraform/
-      #      if-no-files-found: error
+       - name: Download artifact for deployment
+         uses: actions/download-artifact@v3
+         with:
+           name: ${{ env.TF_WORKSPACE }}-terraform-plan
+           path: ./terraform/
+           if-no-files-found: error
   
-      #  - name: Terraform apply
-      #    id: apply
-      #    run: terraform -chdir=terraform apply $tfplan_artifact_name
+       - name: Terraform apply
+         id: apply
+         run: terraform -chdir=terraform apply $tfplan_artifact_name
 
        - name: Terraform output
          id: output
-         run: terraform -chdir=terraform output > $tfoutput_artifact_name
+         run: terraform -chdir=terraform output > ./terraform/$tfoutput_artifact_name
       
        - name: Test terraform output creation
          run: ls -l ./terraform
