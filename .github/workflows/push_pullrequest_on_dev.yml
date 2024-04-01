@@ -251,11 +251,13 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ${{ env.TF_WORKSPACE }}-terraform-output
-          path: .
+          path: ./pytest/
           if-no-files-found: error
  
-      - name: Rename and clean artifact for tests
-        run: mv $tfoutput_artifact_name terraform_output.py
+      - name: Rename artifact for tests
+        run: |
+          ls -l
+          mv $tfoutput_artifact_name terraform_output.py
 
       - name: Run pytest to test infrastructure
         uses: pavelzw/pytest-action@v2
