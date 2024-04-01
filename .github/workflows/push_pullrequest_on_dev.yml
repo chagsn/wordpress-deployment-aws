@@ -95,10 +95,6 @@ jobs:
         env:
           TF_WORKSPACE: dev
 
-      - name: Terraform workspace
-        id: workspace
-        run: terraform workspace select ${{ env.TF_WORKSPACE }}
-
       - name: Terraform plan
         id: plan
         run: terraform -chdir=terraform plan -no-color -out $artifact_name
