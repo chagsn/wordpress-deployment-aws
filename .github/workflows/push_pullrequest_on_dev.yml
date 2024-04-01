@@ -157,7 +157,7 @@ jobs:
 
           
   Deploy:
-    name: Deploy infrascture in dev
+    name: Deploy infrastructure in dev
     needs: [Build]
     runs-on: ubuntu-latest
     defaults:
@@ -191,10 +191,34 @@ jobs:
          uses: actions/download-artifact@v3
          with:
            name: ${{ env.TF_WORKSPACE }}-terraform-plan
+           path: ./terraform/${{ env.artifact_name }}
   
        - name: Terraform apply
          id: apply
          run: terraform -chdir=terraform apply $artifact_name
+
+  # Test-deployment:
+  #  name: Deploy infrastructure in dev
+  #  needs: [Build]
+  #  runs-on: ubuntu-latest
+  #  defaults:
+  #    run:
+  #      shell: bash
+  #      working-directory: .
+  #  env:
+  #    artifact_name: tfplan-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
+  #  steps:
+  #     - name: Git checkout
+  #       uses: actions/checkout@master
+
+  #     - name: Configure AWS credentials from AWS account
+  #       uses: aws-actions/configure-aws-credentials@v1
+  #       with:
+  #         aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         aws-region: ${{ secrets.AWS_REGION }}
+
+      
  
 
 
