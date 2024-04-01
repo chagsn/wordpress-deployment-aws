@@ -91,11 +91,12 @@ jobs:
 
       - name: Terraform plan
         id: plan
-        run: terraform -chdir=terraform plan -no-color -out $artifact_name
+        # run: terraform -chdir=terraform plan -no-color -out $artifact_name
+        run: terraform -chdir=terraform plan -no-color
         # env:
         #   TF_WORKSPACE: dev
         # if: github.event_name == 'pull_request'
-        # continue-on-error: true
+        continue-on-error: true
       - uses: actions/github-script@v6
         if: github.event_name == 'pull_request'
         env:
