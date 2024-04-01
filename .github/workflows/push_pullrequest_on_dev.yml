@@ -50,10 +50,6 @@ jobs:
         id: init
         run: terraform -chdir=terraform init
 
-      - name: Terraform workspace
-        id: workspace
-        run: terraform workspace select ${{ env.TF_WORKSPACE }}
-
       - name: Terraform format
         id: format
         run: terraform -chdir=terraform fmt -check
