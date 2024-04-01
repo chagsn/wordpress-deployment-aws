@@ -66,7 +66,7 @@ jobs:
         shell: bash
         working-directory: .
     env:
-      artifact_name: dev-tfplan-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
+      artifact_name: tfplan-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
 
     steps:
       - name: Git checkout
@@ -101,7 +101,7 @@ jobs:
 
       - name: Comment on Pull Request
         uses: actions/github-script@v6
-        if: github.event_name == 'pull_request'
+        # if: github.event_name == 'pull_request'
         env:
           PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
         with:
@@ -143,13 +143,8 @@ jobs:
       - name: Upload artifact for deployment
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.TF_WORKSPACE }}-execution-plan
-          path: terraform/$artifact_name
-
-      - name: Test artifact creation
-        run: |
-          pwd
-          ls -al terraform/
+          name: $artifact_name
+          path: ./terraform/
 
     # - name: Terraform Apply
       # id: apply
