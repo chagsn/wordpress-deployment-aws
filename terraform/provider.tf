@@ -19,6 +19,6 @@ terraform {
 
 # AWS Provider in deployment region (eu-west-3)
 provider "aws" {
-  profile = "terraform"
+  # profile = "terraform"
   region  = "eu-west-3"
 }
