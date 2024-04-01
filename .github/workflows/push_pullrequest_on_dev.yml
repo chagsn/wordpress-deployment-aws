@@ -244,7 +244,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pytest/requirements.txt
+          pip install requirements.txt
           pip install pytest pytest-md pytest-emoji
 
       - name: Download artifact for tests
