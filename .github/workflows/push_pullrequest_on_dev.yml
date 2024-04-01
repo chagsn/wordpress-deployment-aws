@@ -203,12 +203,9 @@ jobs:
       
        - name: Clean artifact (required for tests)
          run: |
-           ls -l ./terraform
-           cat ./terraform/terraform.output
            sed 1d <./terraform/terraform.output >./terraform/terraform.output.1
            sed '/^::debug/d' <./terraform/terraform.output.1 >./terraform/terraform.output.2
            mv ./terraform/terraform.output.2 ./terraform/$tfoutput_artifact_name
-           cat ./terraform/$tfoutput_artifact_name
  
        - name: Upload terraform output artifact for tests
          uses: actions/upload-artifact@v3
@@ -256,9 +253,7 @@ jobs:
           if-no-files-found: error
  
       - name: Rename artifact for tests
-        run: |
-          ls -l
-          mv $tfoutput_artifact_name terraform_output.py
+        run: mv $tfoutput_artifact_name terraform_output.py
 
       - name: Run pytest to test infrastructure
         uses: pavelzw/pytest-action@v2
@@ -313,7 +308,7 @@ jobs:
         uses: macnev2013/manual-approval@v1.0.18
         with:
           secret: ${{ github.TOKEN }}
-          # approvers: user1,user2
+          approvers: chagsn,sergemad
           minimum-approvals: 1
           approval-wait: 600
           issue-title: 'Manual Approval for destroying dev infa'
