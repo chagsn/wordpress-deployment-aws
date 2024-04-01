@@ -20,7 +20,7 @@ env:
   TF_WORKSPACE: dev
 
 jobs:
-  Validation:
+  Validate:
     name: Validate Terraform code in dev
     runs-on: ubuntu-latest
     defaults:
@@ -57,33 +57,13 @@ jobs:
         id: validate
         run: terraform -chdir=terraform validate -no-color
 
-  Security-test:
+  Test-policy:
           name: Test Terraform code in dev with tfsec
           runs-on: ubuntu-latest
-          # defaults:
-          #   run:
-          #     shell: bash
-          #     working-directory: .
       
           steps:
             - name: Git checkout
               uses: actions/checkout@master
-      
-            # - name: Configure AWS credentials from AWS account
-            #   uses: aws-actions/configure-aws-credentials@v1
-            #   with:
-            #     aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
-            #     aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            #     aws-region: ${{ secrets.AWS_REGION }}
-      
-            # - name: Setup Terraform
-            #   uses: hashicorp/setup-terraform@v2
-            #   with:
-            #     terraform_version: 1.2.5
-            
-            # - name: Terraform init
-            #   id: init
-            #   run: terraform -chdir=terraform init
       
             - name: tfsec
               uses: aquasecurity/tfsec-action@v1.0.0
@@ -91,9 +71,9 @@ jobs:
                 working_directory: ./terraform
                 soft_fail: true
   
-  BuildDev:
+  Build:
     name: Build the plan binary file for dev
-    needs: [Validation]
+    needs: [Validate,Test-policy]
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -121,22 +101,16 @@ jobs:
       - name: Terraform init
         id: init
         run: terraform -chdir=terraform init
-        # env:
-        #   TF_WORKSPACE: dev
 
       - name: Terraform plan
         id: plan
-        run: terraform -chdir=terraform plan -no-color -out $artifact_name
-        # run: terraform -chdir=terraform plan -no-color
-        # env:
-        #   TF_WORKSPACE: dev
+        run: terraform -chdir=terraform plan -out $artifact_name
         # if: github.event_name == 'pull_request'
         continue-on-error: true
 
       - name: Comment on Pull Request
         uses: actions/github-script@v7
-        # if: github.event_name == 'pull_request'
-        continue-on-error: true
+        if: github.event_name == 'pull_request'
         env:
           PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
         with:
@@ -180,6 +154,54 @@ jobs:
         with:
           name: ${{ env.TF_WORKSPACE }}-terraform-plan
           path: ./terraform/${{ env.artifact_name }}
+
+          
+  Deploy:
+    name: Deploy infrascture in dev
+    needs: [Build]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: .
+    env:
+      artifact_name: tfplan-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
+
+    steps:
+       - name: Git checkout
+         uses: actions/checkout@master
+ 
+       - name: Configure AWS credentials from AWS account
+         uses: aws-actions/configure-aws-credentials@v1
+         with:
+           aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+           aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+           aws-region: ${{ secrets.AWS_REGION }}
+ 
+       - name: Setup Terraform
+         uses: hashicorp/setup-terraform@v2
+         with:
+           terraform_version: 1.2.5
+       
+       - name: Terraform init
+         id: init
+         run: terraform -chdir=terraform init
+
+       - name: Download artifact for deployment
+         uses: actions/download-artifact@v3
+         with:
+           name: ${{ env.TF_WORKSPACE }}-terraform-plan
+  
+       - name: Terraform apply
+         id: apply
+         run: terraform -chdir=terraform apply $artifact_name
+ 
+
+
+
+
+
+
 
     # - name: Terraform Apply
       # id: apply
