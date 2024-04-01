@@ -202,9 +202,14 @@ jobs:
          id: output
          run: terraform -chdir=terraform output > ./terraform/$tfoutput_artifact_name
       
-       - name: Test terraform output creation
-         run: ls -l ./terraform
-
+       - name: Clean artifact (required for tests)
+         run: |
+           ls -l ./terraform
+           cat ./terraform/$tfoutput_artifact_name
+           sed 1d <./terraform/$tfoutput_artifact_name >./terraform/$tfoutput_artifact_name
+           sed '/^::debug/d' <./terraform/$tfoutput_artifact_name >./terraform/$tfoutput_artifact_name
+           cat ./terraform/$tfoutput_artifact_name
+ 
        - name: Upload terraform output artifact for tests
          uses: actions/upload-artifact@v3
          with:
@@ -249,14 +254,7 @@ jobs:
           if-no-files-found: error
  
       - name: Rename and clean artifact for tests
-        # run: mv pytest/$tfoutput_artifact_name pytest/terraform_output.py
-        run: |
-          mv pytest/$tfoutput_artifact_name pytest/terraform_output.py
-          ls -l pytest
-          cat pytest/terraform_output.py
-          sed 1d <pytest/terraform_output.py >pytest/terraform_output.py
-          sed '/^::debug/d' <pytest/terraform_output.py >pytest/terraform_output.py
-          cat pytest/terraform_output.py
+        run: mv pytest/$tfoutput_artifact_name pytest/terraform_output.py
 
       - name: Run pytest to test infrastructure
         uses: pavelzw/pytest-action@v2
@@ -266,7 +264,7 @@ jobs:
           verbose: true
           job-summary: true
 
-      - name: Run pytest to test webiste url
+      - name: Run pytest to test website url
         uses: pavelzw/pytest-action@v2
         with:
           custom-arguments: './pytest/test_wordpress_url.py -s'
@@ -284,6 +282,29 @@ jobs:
   #       working-directory: .
   
   #   steps:
+  #     - name: Git checkout
+  #       uses: actions/checkout@master
+
+  #     - name: Configure AWS credentials from AWS account
+  #       uses: aws-actions/configure-aws-credentials@v1
+  #       with:
+  #         aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         aws-region: ${{ secrets.AWS_REGION }}
+
+  #     - name: Setup Terraform
+  #       uses: hashicorp/setup-terraform@v2
+  #       with:
+  #         terraform_version: 1.2.5
+      
+  #     - name: Terraform init
+  #       id: init
+  #       run: terraform -chdir=terraform init
+
+  #     - name: Terraform plan
+  #       id: plan
+  #       run: terraform -chdir=terraform plan
+
   #     - name: Manual approval for destroy
   #       uses: macnev2013/manual-approval@latest
   #       with:
@@ -294,9 +315,10 @@ jobs:
   #         issue-title: 'Manual Approval for destroying dev infa'
   #         issue-body: |
   #           "Do you approve applying terraform destroy on dev deployment? Answer yes or no."
-      - name: Terraform destroy
-        id: destroy
-        run: terraform -chdir=terraform destroy -auto-approve
+
+  #     - name: Terraform destroy
+  #       id: destroy
+  #       run: terraform -chdir=terraform destroy -auto-approve
                
  
 
