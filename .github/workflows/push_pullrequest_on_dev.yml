@@ -106,7 +106,6 @@ jobs:
       - name: Terraform plan
         id: plan
         run: terraform -chdir=terraform plan -out $tfplan_artifact_name
-        # if: github.event_name == 'pull_request'
         continue-on-error: true
 
       - name: Comment on Pull Request
@@ -156,7 +155,6 @@ jobs:
           name: ${{ env.TF_WORKSPACE }}-terraform-plan
           path: ./terraform/${{ env.tfplan_artifact_name }}
           if-no-files-found: error
-
           
   Deploy:
     name: Deploy infrastructure in dev
@@ -244,8 +242,10 @@ jobs:
         with:
           python-version: 3.10.12
 
-      - name: Install pytest and other dependencies
-        run: pip install pytest pytest-md pytest-emoji
+      - name: Install dependencies
+        run: |
+          pip install pytest/requirements.txt
+          pip install pytest pytest-md pytest-emoji
 
       - name: Download artifact for tests
         uses: actions/download-artifact@v3
