@@ -275,50 +275,50 @@ jobs:
           verbose: true
           job-summary: true
 
-  # Destroy:
-  #   name: Terraform destroy (manual approval)
-  #   needs: [Deploy]
-  #   runs-on: ubuntu-latest
-  #   defaults:
-  #     run:
-  #       shell: bash
-  #       working-directory: .
+  Destroy:
+    name: Terraform destroy (manual approval)
+    needs: [Deploy]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: .
   
-  #   steps:
-  #     - name: Git checkout
-  #       uses: actions/checkout@master
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@master
 
-  #     - name: Configure AWS credentials from AWS account
-  #       uses: aws-actions/configure-aws-credentials@v1
-  #       with:
-  #         aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #         aws-region: ${{ secrets.AWS_REGION }}
+      - name: Configure AWS credentials from AWS account
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-  #     - name: Setup Terraform
-  #       uses: hashicorp/setup-terraform@v2
-  #       with:
-  #         terraform_version: 1.2.5
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.2.5
       
-  #     - name: Terraform init
-  #       id: init
-  #       run: terraform -chdir=terraform init
+      - name: Terraform init
+        id: init
+        run: terraform -chdir=terraform init
 
-  #     - name: Terraform plan
-  #       id: plan
-  #       run: terraform -chdir=terraform plan
+      - name: Terraform plan
+        id: plan
+        run: terraform -chdir=terraform plan
 
-  #     - name: Manual approval for destroy
-  #       uses: macnev2013/manual-approval@v1.0.18
-  #       with:
-  #         # secret: ${{ github.TOKEN }}
-  #         # approvers: user1,user2
-  #         minimum-approvals: 1
-  #         approval-wait: 600
-  #         issue-title: 'Manual Approval for destroying dev infa'
-  #         issue-body: |
-  #           "Do you approve applying terraform destroy on dev deployment? Answer yes or no."
+      - name: Manual approval for destroy
+        uses: macnev2013/manual-approval@v1.0.18
+        with:
+          # secret: ${{ github.TOKEN }}
+          # approvers: user1,user2
+          minimum-approvals: 1
+          approval-wait: 600
+          issue-title: 'Manual Approval for destroying dev infa'
+          issue-body: |
+            "Do you approve applying terraform destroy on dev deployment? Answer yes or no."
 
-  #     - name: Terraform destroy
-  #       id: destroy
-  #       run: terraform -chdir=terraform destroy -auto-approve
+      - name: Terraform destroy
+        id: destroy
+        run: terraform -chdir=terraform destroy -auto-approve
