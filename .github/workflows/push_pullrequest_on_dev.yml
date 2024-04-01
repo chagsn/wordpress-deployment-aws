@@ -154,7 +154,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.TF_WORKSPACE }}-terraform-plan
-          path: ./terraform/${{ env.tfplan-artifact_name }}
+          path: ./terraform/${{ env.tfplan_artifact_name }}
           if-no-files-found: error
 
           
