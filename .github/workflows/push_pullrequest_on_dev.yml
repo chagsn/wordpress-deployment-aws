@@ -17,6 +17,7 @@ permissions:
 env:
   TF_LOG: TRACE
   AWS_REGION: ${{ secrets.AWS_REGION }}
+  TF_WORKSPACE: dev
 
 jobs:
   Validation:
@@ -26,9 +27,6 @@ jobs:
       run:
         shell: bash
         working-directory: .
-    env:
-      TF_WORKSPACE: dev
-      artifact_name: dev-tfplan-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
 
     steps:
       - name: Git checkout
@@ -67,7 +65,7 @@ jobs:
         shell: bash
         working-directory: .
     env:
-      TF_WORKSPACE: dev
+      artifact_name: dev-tfplan-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
 
     steps:
       - name: Git checkout
@@ -88,8 +86,8 @@ jobs:
       - name: Terraform init
         id: init
         run: terraform -chdir=terraform init
-        env:
-          TF_WORKSPACE: dev
+        # env:
+        #   TF_WORKSPACE: dev
 
       - name: Terraform plan
         id: plan
