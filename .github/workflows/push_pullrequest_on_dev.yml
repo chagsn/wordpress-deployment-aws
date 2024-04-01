@@ -224,7 +224,7 @@ jobs:
    defaults:
      run:
        shell: bash
-       working-directory: .
+       working-directory: ./pytest/
 
    steps:
       - name: Git checkout
@@ -251,16 +251,16 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ${{ env.TF_WORKSPACE }}-terraform-output
-          path: ./pytest/
+          path: .
           if-no-files-found: error
  
       - name: Rename and clean artifact for tests
-        run: mv pytest/$tfoutput_artifact_name pytest/terraform_output.py
+        run: mv $tfoutput_artifact_name terraform_output.py
 
       - name: Run pytest to test infrastructure
         uses: pavelzw/pytest-action@v2
         with:
-          custom-arguments: './pytest/test_wordpress_infra_for_pipeline.py -s'
+          custom-arguments: 'test_wordpress_infra_for_pipeline.py -s'
           emoji: true
           verbose: true
           job-summary: true
@@ -268,7 +268,7 @@ jobs:
       - name: Run pytest to test website url
         uses: pavelzw/pytest-action@v2
         with:
-          custom-arguments: './pytest/test_wordpress_url.py -s'
+          custom-arguments: 'test_wordpress_url.py -s'
           emoji: true
           verbose: true
           job-summary: true
