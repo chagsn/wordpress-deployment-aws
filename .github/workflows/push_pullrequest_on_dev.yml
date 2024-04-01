@@ -154,6 +154,7 @@ jobs:
         with:
           name: ${{ env.TF_WORKSPACE }}-terraform-plan
           path: ./terraform/${{ env.artifact_name }}
+          if-no-files-found: error
 
           
   Deploy:
@@ -192,6 +193,7 @@ jobs:
          with:
            name: ${{ env.TF_WORKSPACE }}-terraform-plan
            path: ./terraform/
+           if-no-files-found: error
   
        - name: Terraform apply
          id: apply
