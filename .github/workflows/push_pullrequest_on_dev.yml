@@ -254,7 +254,7 @@ jobs:
       - name: Run pytest to test infrastructure
         uses: pavelzw/pytest-action@v2
         with:
-          custom-arguments: 'test_wordpress_infra_for_pipeline.py'
+          custom-arguments: './pytest/test_wordpress_infra_for_pipeline.py -s'
           emoji: true
           verbose: true
           job-summary: true
@@ -262,7 +262,7 @@ jobs:
       - name: Run pytest to test webiste url
         uses: pavelzw/pytest-action@v2
         with:
-          custom-arguments: 'test_wordpress_url.py'
+          custom-arguments: './pytest/test_wordpress_url.py -s'
           emoji: true
           verbose: true
           job-summary: true
