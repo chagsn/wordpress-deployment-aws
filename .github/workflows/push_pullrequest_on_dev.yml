@@ -254,7 +254,8 @@ jobs:
           mv pytest/$tfoutput_artifact_name pytest/terraform_output.py
           ls -l pytest
           cat pytest/terraform_output.py
-          sed '/^\(\[command\]\|::debug\)/d'
+          sed 1d <pytest/terraform_output.py >pytest/terraform_output.py
+          sed '/^::debug/d' <pytest/terraform_output.py >pytest/terraform_output.py
           cat pytest/terraform_output.py
 
       - name: Run pytest to test infrastructure
@@ -293,6 +294,9 @@ jobs:
   #         issue-title: 'Manual Approval for destroying dev infa'
   #         issue-body: |
   #           "Do you approve applying terraform destroy on dev deployment? Answer yes or no."
+      - name: Terraform destroy
+        id: destroy
+        run: terraform -chdir=terraform destroy -auto-approve
                
  
 
