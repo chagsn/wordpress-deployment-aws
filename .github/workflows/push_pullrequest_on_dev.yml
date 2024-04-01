@@ -2,7 +2,7 @@ name: "Terraform deployment on dev"
 on:
   push:
     branches:
-      - dev
+      - charlotte-dev
     paths-ignore:
       - "README.md"
   pull_request:
