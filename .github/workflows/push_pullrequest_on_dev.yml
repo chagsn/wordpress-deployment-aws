@@ -56,7 +56,6 @@ jobs:
       - name: Terraform validate
         id: validate
         run: terraform -chdir=terraform validate -no-color
-        continue-on-error: true
 
   BuildDev:
     name: Build the plan file for dev
@@ -93,8 +92,8 @@ jobs:
 
       - name: Terraform plan
         id: plan
-        # run: terraform -chdir=terraform plan -no-color -out $artifact_name
-        run: terraform -chdir=terraform plan -no-color
+        run: terraform -chdir=terraform plan -no-color -out $artifact_name
+        # run: terraform -chdir=terraform plan -no-color
         # env:
         #   TF_WORKSPACE: dev
         # if: github.event_name == 'pull_request'
