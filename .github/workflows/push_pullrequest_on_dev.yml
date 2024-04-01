@@ -100,7 +100,7 @@ jobs:
         continue-on-error: true
 
       - name: Comment on Pull Request
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         # if: github.event_name == 'pull_request'
         continue-on-error: true
         env:
@@ -144,7 +144,7 @@ jobs:
       - name: Upload artifact for deployment
         uses: actions/upload-artifact@v3
         with:
-          name: $artifact_name
+          name: ${{ env.artifact_name }}
           path: ./terraform/
 
     # - name: Terraform Apply
