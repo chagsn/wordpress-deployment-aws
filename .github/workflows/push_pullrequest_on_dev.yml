@@ -205,7 +205,7 @@ jobs:
        - name: Clean artifact (required for tests)
          run: |
            ls -l ./terraform
-           cat ./terraform/$tfoutput_artifact_name
+           cat ./terraform/terraform.output
            sed 1d <./terraform/terraform.output >./terraform/terraform.output.1
            sed '/^::debug/d' <terraform.output.1 >./terraform/terraform.output.2
            mv ./terraform/terraform.output.2 ./terraform/$tfoutput_artifact_name
@@ -320,18 +320,3 @@ jobs:
   #     - name: Terraform destroy
   #       id: destroy
   #       run: terraform -chdir=terraform destroy -auto-approve
-               
- 
-
-
-
-
-
-
-
-    # - name: Terraform Apply
-      # id: apply
-      # if: github.event_name == 'push'
-      # run: terraform -chdir=terraform apply -auto-approve
-      # env:
-      #   TF_WORKSPACE: dev
