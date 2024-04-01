@@ -149,7 +149,7 @@ jobs:
       - name: Test artifact creation
         run: |
           pwd
-          ls -al
+          ls -al terraform/
 
     # - name: Terraform Apply
       # id: apply
