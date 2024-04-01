@@ -98,7 +98,9 @@ jobs:
         #   TF_WORKSPACE: dev
         # if: github.event_name == 'pull_request'
         continue-on-error: true
-      - uses: actions/github-script@v6
+
+      - name: Comment on Pull Request
+        uses: actions/github-script@v6
         if: github.event_name == 'pull_request'
         env:
           PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
@@ -144,7 +146,12 @@ jobs:
           name: ${{ env.TF_WORKSPACE }}-execution-plan
           path: terraform/$artifact_name
 
-      # - name: Terraform Apply
+      - name: Test artifact creation
+        run: |
+          pwd
+          ls -al
+
+    # - name: Terraform Apply
       # id: apply
       # if: github.event_name == 'push'
       # run: terraform -chdir=terraform apply -auto-approve
