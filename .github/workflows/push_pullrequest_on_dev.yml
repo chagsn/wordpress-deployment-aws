@@ -18,6 +18,9 @@ env:
   # TF_LOG: TRACE
   AWS_REGION: ${{ secrets.AWS_REGION }}
   TF_WORKSPACE: dev
+  tfplan_artifact_name: tfplan-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
+  tfoutput_artifact_name: tfoutput-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
+
 
 jobs:
   Validate:
@@ -79,8 +82,6 @@ jobs:
       run:
         shell: bash
         working-directory: .
-    env:
-      artifact_name: tfplan-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
 
     steps:
       - name: Git checkout
@@ -104,7 +105,7 @@ jobs:
 
       - name: Terraform plan
         id: plan
-        run: terraform -chdir=terraform plan -out $artifact_name
+        run: terraform -chdir=terraform plan -out $tfplan-artifact_name
         # if: github.event_name == 'pull_request'
         continue-on-error: true
 
@@ -153,7 +154,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.TF_WORKSPACE }}-terraform-plan
-          path: ./terraform/${{ env.artifact_name }}
+          path: ./terraform/${{ env.tfplan-artifact_name }}
           if-no-files-found: error
 
           
@@ -165,8 +166,6 @@ jobs:
       run:
         shell: bash
         working-directory: .
-    env:
-      artifact_name: tfplan-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
 
     steps:
        - name: Git checkout
@@ -197,27 +196,65 @@ jobs:
   
        - name: Terraform apply
          id: apply
-         run: terraform -chdir=terraform apply $artifact_name
+         run: terraform -chdir=terraform apply $tfplan_artifact_name
 
-  # Test-deployment:
-  #  name: Test infrastructure deployment
-  #  needs: [Deploy]
-  #  runs-on: ubuntu-latest
-  #  defaults:
-  #    run:
-  #      shell: bash
-  #      working-directory: .
+       - name: Terraform output
+         id: output
+         run: terraform -chdir=terraform output > $tfoutput_artifact_name
 
-  #  steps:
-  #     - name: Git checkout
-  #       uses: actions/checkout@master
+       - name: Upload terraform output artifact for tests
+         uses: actions/upload-artifact@v3
+         with:
+           name: ${{ env.TF_WORKSPACE }}-terraform-output
+           path: ./terraform/${{ env.tfoutput_artifact_name }}
+           if-no-files-found: error
+ 
+           
+  Test-deployment:
+   name: Test infrastructure deployment
+   needs: [Deploy]
+   runs-on: ubuntu-latest
+   defaults:
+     run:
+       shell: bash
+       working-directory: .
 
-  #     - name: Configure AWS credentials from AWS account
-  #       uses: aws-actions/configure-aws-credentials@v1
-  #       with:
-  #         aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #         aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #         aws-region: ${{ secrets.AWS_REGION }}
+   steps:
+      - name: Git checkout
+        uses: actions/checkout@master
+
+      - name: Configure AWS credentials from AWS account
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10.12
+
+      - name: Install pytest and other dependencies
+        run: pip install pytest pytest-md pytest-emoji
+
+      - name: Download artifact for tests
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ env.TF_WORKSPACE }}-terraform-output
+          path: ./pytest/
+          if-no-files-found: error
+ 
+      - name: Rename artifact for tests
+        run: mv pytests/$tfoutput-artifact_name pytest/terraform_output.py
+
+      - name: Run pytest
+        uses: pavelzw/pytest-action@v2
+        with:
+          custom-arguments: 'test_check_wordpress.py'
+          emoji: true
+          verbose: true
+          job-summary: true
 
       
  
