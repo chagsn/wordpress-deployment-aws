@@ -142,7 +142,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ env.TF_WORKSPACE }}-execution-plan
-          path: $artifact_name
+          path: terraform/$artifact_name
 
       # - name: Terraform Apply
       # id: apply
