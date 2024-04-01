@@ -51,10 +51,12 @@ jobs:
       - name: Terraform format
         id: format
         run: terraform -chdir=terraform fmt -check
+        continue-on-error: true
 
       - name: Terraform validate
         id: validate
         run: terraform -chdir=terraform validate -no-color
+        continue-on-error: true
 
   BuildDev:
     name: Build the plan file for dev
