@@ -248,8 +248,14 @@ jobs:
           path: ./pytest/
           if-no-files-found: error
  
-      - name: Rename artifact for tests
-        run: mv pytest/$tfoutput_artifact_name pytest/terraform_output.py
+      - name: Rename and clean artifact for tests
+        # run: mv pytest/$tfoutput_artifact_name pytest/terraform_output.py
+        run: |
+          mv pytest/$tfoutput_artifact_name pytest/terraform_output.py
+          ls -l pytest
+          cat pytest/terraform_output.py
+          sed '/^\(\[command\]\|::debug\)/d'
+          cat pytest/terraform_output.py
 
       - name: Run pytest to test infrastructure
         uses: pavelzw/pytest-action@v2
