@@ -144,8 +144,8 @@ jobs:
       - name: Upload artifact for deployment
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.artifact_name }}
-          path: ./terraform/
+          name: ${{ env.TF_WORKSPACE }}-terraform-plan
+          path: ./terraform/${{ env.artifact_name }}
 
     # - name: Terraform Apply
       # id: apply
