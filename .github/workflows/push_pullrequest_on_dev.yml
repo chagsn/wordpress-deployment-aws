@@ -129,7 +129,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const { readFile } = require("fs/promises")
-            const data = await readFile('plan.  
+            const data = await readFile('plan.out')
             const plan = "terraform\n" + data.length > 65000 ? `${data.substring(0, 65000)}...` : data
           
             const output = `#### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
