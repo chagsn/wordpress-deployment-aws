@@ -184,7 +184,6 @@ jobs:
    defaults:
      run:
        shell: bash
-       working-directory: pytest
 
    steps:
       - name: Wait for deployment to be ready fot the tests
@@ -218,7 +217,7 @@ jobs:
           if-no-files-found: error
  
       - name: Rename artifact for tests
-        run: mv $tfoutput_artifact_name terraform_output.py
+        run: mv ./pytest/$tfoutput_artifact_name ./pytest/terraform_output.py
 
       - name: Run pytest to test infrastructure
         uses: pavelzw/pytest-action@v2
