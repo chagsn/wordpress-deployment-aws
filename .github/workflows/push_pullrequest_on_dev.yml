@@ -283,3 +283,4 @@ jobs:
       - name: Terraform destroy
         id: destroy
         run: terraform -chdir=terraform destroy -auto-approve
+        
