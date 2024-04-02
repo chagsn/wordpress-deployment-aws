@@ -4,7 +4,7 @@ terraform {
 
   # Remote backend
   backend "s3" {
-    profile        = "terraform"
+    # profile        = "terraform"
     bucket         = "projet-storm-web2-terraform-backend"
     key            = "terraform.tfstate"
     dynamodb_table = "projet-storm-web2-terraform-lock"
@@ -21,6 +21,6 @@ terraform {
 
 # AWS Provider in deployment region (eu-west-3)
 provider "aws" {
-  profile = "terraform"
+  # profile = "terraform"
   region  = "eu-west-3"
 }
