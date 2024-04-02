@@ -184,7 +184,7 @@ jobs:
    defaults:
      run:
        shell: bash
-       working-directory: ./pytest/
+       working-directory: pytest
 
    steps:
       - name: Wait for deployment to be ready fot the tests
