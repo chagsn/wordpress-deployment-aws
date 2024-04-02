@@ -2,7 +2,7 @@ name: "Terraform deployment on dev"
 on:
   push:
     branches:
-      - charlotte-dev
+      - dev
     paths-ignore:
       - "README.md"
   pull_request:
@@ -63,6 +63,7 @@ jobs:
         id: validate
         run: terraform -chdir=terraform validate -no-color
 
+
   Test-security:
           name: TEST security
           runs-on: ubuntu-latest
@@ -99,7 +100,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.7.5
       
@@ -140,7 +141,7 @@ jobs:
            aws-region: ${{ secrets.AWS_REGION }}
  
        - name: Setup Terraform
-         uses: hashicorp/setup-terraform@v2
+         uses: hashicorp/setup-terraform@v3
          with:
            terraform_version: 1.7.5
        
@@ -257,7 +258,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.7.5
       
@@ -283,4 +284,3 @@ jobs:
       - name: Terraform destroy
         id: destroy
         run: terraform -chdir=terraform destroy -auto-approve
-        
