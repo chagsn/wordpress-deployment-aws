@@ -166,9 +166,7 @@ jobs:
       
        - name: Clean artifact (required for tests)
          run: |
-           sed 1d <./terraform/terraform.output >./terraform/terraform.output.1
-           sed '/^::debug/d' <./terraform/terraform.output.1 >./terraform/terraform.output.2
-           mv ./terraform/terraform.output.2 ./terraform/$tfoutput_artifact_name
+           sed '/^\(cloudfront\|ecs\|rds\)/!d' <./terraform/terraform.output >./terraform/$tfoutput_artifact_name
  
        - name: Upload terraform output artifact for tests
          uses: actions/upload-artifact@v3
