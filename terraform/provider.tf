@@ -1,5 +1,7 @@
 terraform {
 
+  required_version = "~> 1.7.5"
+
   # Remote backend
   backend "s3" {
     profile        = "terraform"
