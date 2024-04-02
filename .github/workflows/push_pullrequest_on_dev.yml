@@ -187,6 +187,9 @@ jobs:
        working-directory: ./pytest/
 
    steps:
+      - name: Wait for deployment to be ready fot the tests
+        run: sleep 3m
+
       - name: Git checkout
         uses: actions/checkout@master
 
