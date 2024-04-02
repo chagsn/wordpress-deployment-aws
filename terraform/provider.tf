@@ -1,6 +1,6 @@
 terraform {
 
-  required_version = "~> 1.7.5"
+  required_version = "~> 1.7.0"
 
   # Remote backend
   backend "s3" {
