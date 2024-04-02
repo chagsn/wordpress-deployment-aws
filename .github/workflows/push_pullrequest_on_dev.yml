@@ -187,7 +187,7 @@ jobs:
 
    steps:
       - name: Wait for deployment to be ready fot the tests
-        run: sleep 3m
+        run: sleep 6m
 
       - name: Git checkout
         uses: actions/checkout@master
