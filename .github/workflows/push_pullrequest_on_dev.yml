@@ -126,7 +126,7 @@ jobs:
         # env:
         #   PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ github.TOKEN }}
           script: |
             const { readFile } = require("fs/promises")
             const data = await readFile('plan.out')
