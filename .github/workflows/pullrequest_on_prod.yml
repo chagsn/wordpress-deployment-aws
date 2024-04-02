@@ -419,7 +419,7 @@ jobs:
           job-summary: true
 
   DestroyDev:
-    name: DESTROY dev infra (manual approval)
+    name: DESTROY dev infra ? (manual approval)
     needs: [DeployDev]
     runs-on: ubuntu-latest
     env:
@@ -462,7 +462,8 @@ jobs:
           approval-wait: 1200
           issue-title: 'Manual Approval for destroying dev infra'
           issue-body: |
-            "Do you approve applying terraform destroy on dev deployment?" 
+            "Do you approve applying terraform destroy on dev deployment?"
+          continue-on-error: true
              
       - name: Terraform destroy
         id: destroy
