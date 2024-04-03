@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
         TF_WORKSPACE: dev
-        tfplan_artifact_name: dev-tfplan-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
+        tfplan_artifact_name: dev-tfplan-${{ github.head_ref }}-${{ github.run_id }}-${{ github.run_attempt }}
     defaults:
       run:
         shell: bash
@@ -119,7 +119,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
         TF_WORKSPACE: prod
-        tfplan_artifact_name: prod-tfplan-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
+        tfplan_artifact_name: prod-tfplan-${{ github.head_ref }}-${{ github.run_id }}-${{ github.run_attempt }}
     defaults:
       run:
         shell: bash
@@ -162,8 +162,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
         TF_WORKSPACE: dev
-        tfplan_artifact_name: dev-tfplan-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
-        tfoutput_artifact_name: dev-tfoutput-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
+        tfplan_artifact_name: dev-tfplan-${{ github.head_ref }}-${{ github.run_id }}-${{ github.run_attempt }}
+        tfoutput_artifact_name: dev-tfoutput-${{ github.head_ref }}-${{ github.run_id }}-${{ github.run_attempt }}
     defaults:
       run:
         shell: bash
@@ -222,7 +222,7 @@ jobs:
    runs-on: ubuntu-latest
    env:
       TF_WORKSPACE: dev
-      tfoutput_artifact_name: dev-tfoutput-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
+      tfoutput_artifact_name: dev-tfoutput-${{ github.head_ref }}-${{ github.run_id }}-${{ github.run_attempt }}
    defaults:
      run:
        shell: bash
@@ -284,8 +284,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
         TF_WORKSPACE: prod
-        tfplan_artifact_name: prod-tfplan-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
-        tfoutput_artifact_name: prod-tfoutput-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
+        tfplan_artifact_name: prod-tfplan-${{ github.head_ref }}-${{ github.run_id }}-${{ github.run_attempt }}
+        tfoutput_artifact_name: prod-tfoutput-${{ github.head_ref }}-${{ github.run_id }}-${{ github.run_attempt }}
     defaults:
       run:
         shell: bash
@@ -356,7 +356,7 @@ jobs:
    runs-on: ubuntu-latest
    env:
       TF_WORKSPACE: prod
-      tfoutput_artifact_name: prod-tfoutput-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
+      tfoutput_artifact_name: prod-tfoutput-${{ github.head_ref }}-${{ github.run_id }}-${{ github.run_attempt }}
    defaults:
      run:
        shell: bash
