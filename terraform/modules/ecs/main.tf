@@ -67,6 +67,7 @@ module "wordpress-service" {
   memory = var.containers_sizing["memory"]
 
   # Autoscaling configuration
+  desired_count = var.autoscaling_range["min_capacity"]
   autoscaling_min_capacity = var.autoscaling_range["min_capacity"]
   autoscaling_max_capacity = var.autoscaling_range["max_capacity"]
 
