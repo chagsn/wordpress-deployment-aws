@@ -2,14 +2,16 @@ name: "Terraform action"
 on:
   push:
     branches:
-      - prd
+      - dev
   pull_request:
+    branches:
+      - dev
 permissions:
       id-token: write # This is required for aws oidc connection
       contents: read # This is required for actions/checkout
       pull-requests: write # This is required for gh bot to comment PR
 env:
-  TF_LOG: INFO
+  TF_LOG: TRACE
   AWS_REGION: ${{ secrets.AWS_REGION }}
 jobs:
   deploy:
@@ -20,38 +22,37 @@ jobs:
         working-directory: .
     steps:
       - name: Git checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@master
 
       - name: Configure AWS credentials from AWS account
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          #aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          #aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          role-to-assume: ${{ secrets.AWS_ROLE }}
+          aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
-          role-session-name: GitHub-OIDC-TERRAFORM
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.2.5
-
-      - name: Terraform fmt
-        id: fmt
-        run: terraform fmt -check
-        continue-on-error: true
-
-      - name: Terraform Init
+      
+      - name: Terraform init
         id: init
-        run: terraform init
+        run: terraform -chdir=terraform init
+        env:
+          TF_WORKSPACE: dev
 
       - name: Terraform Validate
         id: validate
-        run: terraform validate -no-color
+        run: terraform -chdir=terraform validate
+        env:
+          TF_WORKSPACE: dev
 
       - name: Terraform Plan
         id: plan
-        run: terraform plan -no-color
+        run: terraform -chdir=terraform plan -no-color
+        env:
+          TF_WORKSPACE: dev
         if: github.event_name == 'pull_request'
         continue-on-error: true
 
@@ -62,8 +63,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
-            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+            const output = `#### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
             #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
             <details><summary>Validation Output</summary>
 
@@ -90,7 +90,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: output
-            })
+            }) 
 
       - name: Terraform Plan Status
         if: steps.plan.outcome == 'failure'
@@ -98,10 +98,7 @@ jobs:
 
       - name: Terraform Apply
         id: apply
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve -input=false
-
-    #  - name: Run unit tests
-     #   if: steps.apply.outcome == 'sucess'
-     #   run: |
-        #
+        if: github.event_name == 'push'
+        run: terraform -chdir=terraform apply -auto-approve
+        env:
+          TF_WORKSPACE: dev
