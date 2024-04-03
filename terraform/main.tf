@@ -75,8 +75,24 @@ module "rds" {
 }
 
 module "bucket" {
-  source = "./modules/bucket"
-  env    = local.env
+  source              = "./modules/bucket"
+  env                 = local.env
+  cloudfront_oai_arns = module.cloudfront.cloudfront_oai_arns
+}
+
+module "cloudfront" {
+  source                 = "./modules/cloudfront"
+  s3_logs_dns            = module.bucket.s3_logs_dns
+  s3_wordpress_media_dns = module.bucket.s3_wordpress_media_regional_dns
+  alb_dns_name           = module.alb.alb_dns_name
+}
+
+module "route53" {
+  source         = "./modules/route53"
+  domain_name    = var.domain_name
+  cloudfront_dns = module.cloudfront.cloudfront_dns
+  cloudfront_id  = module.cloudfront.cloudfront_id
+  subdomain_name = var.subdomain_name
 }
 
 # module "backup" {

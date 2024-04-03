@@ -1,0 +1,464 @@
+name: "Terraform deployment on prod"
+on:
+    pull_request:
+      branches:
+        - prd
+      paths-ignore:
+        - "README.md"
+permissions:
+    id-token: write      # This is required for aws oidc connection
+    issues: write        # This is required for jobs with manual approval
+    contents: read       # This is required for actions/checkout
+    pull-requests: write # This is required for gh bot to comment PR
+env:
+  # TF_LOG: TRACE
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+
+
+jobs:
+  Validate:
+    name: VALIDATE Terraform
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: .
+
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@master
+
+      - name: Configure AWS credentials from AWS account
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+      
+      - name: Terraform init
+        id: init
+        run: terraform -chdir=terraform init
+
+    #   - name: Terraform format
+    #     id: format
+    #     run: terraform -chdir=terraform fmt -check
+    #     continue-on-error: true
+
+      - name: Terraform validate
+        id: validate
+        run: terraform -chdir=terraform validate -no-color
+
+
+  Test-security:
+          name: TEST security
+          runs-on: ubuntu-latest
+      
+          steps:
+            - name: Git checkout
+              uses: actions/checkout@master
+      
+            - name: tfsec
+              uses: aquasecurity/tfsec-action@v1.0.0
+              with:
+                working_directory: ./terraform
+                soft_fail: true
+
+                
+  BuildDev:
+    name: BUILD Terraform plan for dev
+    needs: [Validate,Test-security]
+    runs-on: ubuntu-latest
+    env:
+        TF_WORKSPACE: dev
+        tfplan_artifact_name: dev-tfplan-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: .
+
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@master
+
+      - name: Configure AWS credentials from AWS account
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.7.5
+      
+      - name: Terraform init
+        id: init
+        run: terraform -chdir=terraform init
+
+      - name: Terraform plan
+        id: plan
+        run: terraform -chdir=terraform plan -out $tfplan_artifact_name
+
+      - name: Upload artifact for deployment
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.TF_WORKSPACE }}-terraform-plan
+          path: ./terraform/${{ env.tfplan_artifact_name }}
+          if-no-files-found: error
+
+
+  BuildProd:
+    name: BUILD Terraform plan for prod
+    needs: [Validate,Test-security]
+    runs-on: ubuntu-latest
+    env:
+        TF_WORKSPACE: prod
+        tfplan_artifact_name: prod-tfplan-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: .  
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@master  
+
+      - name: Configure AWS credentials from AWS account
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}  
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+      
+      - name: Terraform init
+        id: init
+        run: terraform -chdir=terraform init  
+
+      - name: Terraform plan
+        id: plan
+        run: terraform -chdir=terraform plan -out $tfplan_artifact_name
+
+      - name: Upload artifact for deployment
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.TF_WORKSPACE }}-terraform-plan
+          path: ./terraform/${{ env.tfplan_artifact_name }}
+          if-no-files-found: error
+        
+                  
+  DeployDev:
+    name: DEPLOY infrastructure in dev
+    needs: [BuildDev]
+    runs-on: ubuntu-latest
+    env:
+        TF_WORKSPACE: dev
+        tfplan_artifact_name: dev-tfplan-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
+        tfoutput_artifact_name: dev-tfoutput-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: .
+
+    steps:
+       - name: Git checkout
+         uses: actions/checkout@master
+ 
+       - name: Configure AWS credentials from AWS account
+         uses: aws-actions/configure-aws-credentials@v1
+         with:
+           aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+           aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+           aws-region: ${{ secrets.AWS_REGION }}
+ 
+       - name: Setup Terraform
+         uses: hashicorp/setup-terraform@v3
+         with:
+           terraform_version: 1.7.5
+       
+       - name: Terraform init
+         id: init
+         run: terraform -chdir=terraform init
+
+       - name: Download artifact for deployment
+         uses: actions/download-artifact@v3
+         with:
+           name: ${{ env.TF_WORKSPACE }}-terraform-plan
+           path: ./terraform/
+           if-no-files-found: error
+  
+       - name: Terraform apply
+         id: apply
+         run: terraform -chdir=terraform apply $tfplan_artifact_name
+
+       - name: Terraform output
+         id: output
+         run: terraform -chdir=terraform output > ./terraform/terraform.output
+      
+       - name: Clean artifact (required for tests)
+         run: |
+           sed '/^\(cloudfront\|ecs\|rds\)/!d' <./terraform/terraform.output >./terraform/$tfoutput_artifact_name
+
+       - name: Upload terraform output artifact for tests
+         uses: actions/upload-artifact@v3
+         with:
+           name: ${{ env.TF_WORKSPACE }}-terraform-output
+           path: ./terraform/${{ env.tfoutput_artifact_name }}
+           if-no-files-found: error
+ 
+           
+  TestDev:
+   name: TEST dev deployment
+   needs: [DeployDev]
+   runs-on: ubuntu-latest
+   env:
+      TF_WORKSPACE: dev
+      tfoutput_artifact_name: dev-tfoutput-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
+   defaults:
+     run:
+       shell: bash
+  
+   steps:
+      - name: Wait for deployment to be ready fot the tests
+        run: sleep 6m
+
+      - name: Git checkout
+        uses: actions/checkout@master
+  
+      - name: Configure AWS credentials from AWS account
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+  
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10.12
+  
+      - name: Install dependencies
+        run: |
+          pip install -r ./pytest/requirements.txt
+          pip install pytest pytest-md pytest-emoji
+  
+      - name: Download artifact for tests
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ env.TF_WORKSPACE }}-terraform-output
+          path: ./pytest/
+          if-no-files-found: error
+  
+      - name: Rename artifact for tests
+        run: mv ./pytest/$tfoutput_artifact_name ./pytest/terraform_output.py
+  
+      - name: Run pytest to test infrastructure
+        uses: pavelzw/pytest-action@v2
+        with:
+          custom-arguments: './pytest/test_wordpress_infra_for_pipeline.py -s'
+          emoji: true
+          verbose: true
+          job-summary: true
+  
+      - name: Run pytest to test website url
+        uses: pavelzw/pytest-action@v2
+        with:
+          custom-arguments: './pytest/test_wordpress_url.py -s'
+          emoji: true
+          verbose: true
+          job-summary: true
+         
+
+  DeployProd:
+    name: DEPLOY infrastructure in prod (manual approval)
+    needs: [BuildProd,TestDev]
+    runs-on: ubuntu-latest
+    env:
+        TF_WORKSPACE: prod
+        tfplan_artifact_name: prod-tfplan-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
+        tfoutput_artifact_name: prod-tfoutput-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: .
+
+    steps:
+
+       - name: Git checkout
+         uses: actions/checkout@master
+
+       - name: Manual approval for prod deployment
+         uses: macnev2013/manual-approval@v1.0.18
+         with:
+           secret: ${{ github.TOKEN }}
+           approvers: chagsn,sergemad
+           minimum-approvals: 1
+           approval-wait: 3600
+           issue-title: 'Manual Approval for deploying prod infra'
+           issue-body: |
+             "Do you approve deploying terraform infra in prod environment?"
+
+       - name: Configure AWS credentials from AWS account
+         uses: aws-actions/configure-aws-credentials@v1
+         with:
+           aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+           aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+           aws-region: ${{ secrets.AWS_REGION }}
+ 
+       - name: Setup Terraform
+         uses: hashicorp/setup-terraform@v3
+         with:
+           terraform_version: 1.7.5
+       
+       - name: Terraform init
+         id: init
+         run: terraform -chdir=terraform init
+
+       - name: Download artifact for deployment
+         uses: actions/download-artifact@v3
+         with:
+           name: ${{ env.TF_WORKSPACE }}-terraform-plan
+           path: ./terraform/
+           if-no-files-found: error
+  
+       - name: Terraform apply
+         id: apply
+         run: terraform -chdir=terraform apply $tfplan_artifact_name
+
+       - name: Terraform output
+         id: output
+         run: terraform -chdir=terraform output > ./terraform/terraform.output
+      
+       - name: Clean artifact (required for tests)
+         run: |
+           sed '/^\(cloudfront\|ecs\|rds\)/!d' <./terraform/terraform.output >./terraform/$tfoutput_artifact_name
+
+       - name: Upload terraform output artifact for tests
+         uses: actions/upload-artifact@v3
+         with:
+           name: ${{ env.TF_WORKSPACE }}-terraform-output
+           path: ./terraform/${{ env.tfoutput_artifact_name }}
+           if-no-files-found: error
+ 
+           
+  TestProd:
+   name: TEST prod deployment
+   needs: [DeployProd]
+   runs-on: ubuntu-latest
+   env:
+      TF_WORKSPACE: prod
+      tfoutput_artifact_name: prod-tfoutput-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
+   defaults:
+     run:
+       shell: bash
+  
+   steps:
+      - name: Wait for deployment to be ready fot the tests
+        run: sleep 6m
+
+      - name: Git checkout
+        uses: actions/checkout@master
+  
+      - name: Configure AWS credentials from AWS account
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+  
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10.12
+  
+      - name: Install dependencies
+        run: |
+          pip install -r ./pytest/requirements.txt
+          pip install pytest pytest-md pytest-emoji
+  
+      - name: Download artifact for tests
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ env.TF_WORKSPACE }}-terraform-output
+          path: ./pytest/
+          if-no-files-found: error
+  
+      - name: Rename artifact for tests
+        run: mv ./pytest/$tfoutput_artifact_name ./pytest/terraform_output.py
+  
+      - name: Run pytest to test infrastructure
+        uses: pavelzw/pytest-action@v2
+        with:
+          custom-arguments: './pytest/test_wordpress_infra_for_pipeline.py -s'
+          emoji: true
+          verbose: true
+          job-summary: true
+  
+      - name: Run pytest to test website url
+        uses: pavelzw/pytest-action@v2
+        with:
+          custom-arguments: './pytest/test_wordpress_url.py -s'
+          emoji: true
+          verbose: true
+          job-summary: true
+
+  DestroyDev:
+    name: DESTROY dev infra ? (manual approval)
+    needs: [DeployDev]
+    runs-on: ubuntu-latest
+    env:
+      TF_WORKSPACE: dev
+    defaults:
+      run:
+        shell: bash
+        working-directory: .
+  
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@master  
+
+      - name: Configure AWS credentials from AWS account
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}  
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+      
+      - name: Terraform init
+        id: init
+        run: terraform -chdir=terraform init  
+
+      - name: Terraform plan
+        id: plan
+        run: terraform -chdir=terraform plan  
+
+      - name: Manual approval for destroy
+        uses: macnev2013/manual-approval@v1.0.18
+        with:
+          secret: ${{ github.TOKEN }}
+          approvers: chagsn,sergemad
+          minimum-approvals: 1
+          approval-wait: 1200
+          issue-title: 'Manual Approval for destroying dev infra'
+          issue-body: |
+            "Do you approve applying terraform destroy on dev deployment?"
+          continue-on-error: true
+             
+      - name: Terraform destroy
+        id: destroy
+        run: terraform -chdir=terraform destroy -auto-approve
+        
