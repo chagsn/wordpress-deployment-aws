@@ -29,7 +29,7 @@ jobs:
         uses: actions/checkout@master
 
       - name: Configure AWS credentials from AWS account
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -86,7 +86,7 @@ jobs:
         uses: actions/checkout@master
 
       - name: Configure AWS credentials from AWS account
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -129,7 +129,7 @@ jobs:
         uses: actions/checkout@master  
 
       - name: Configure AWS credentials from AWS account
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -174,7 +174,7 @@ jobs:
          uses: actions/checkout@master
  
        - name: Configure AWS credentials from AWS account
-         uses: aws-actions/configure-aws-credentials@v1
+         uses: aws-actions/configure-aws-credentials@v4
          with:
            aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
            aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -194,7 +194,6 @@ jobs:
          with:
            name: ${{ env.TF_WORKSPACE }}-terraform-plan
            path: ./terraform/
-           if-no-files-found: error
   
        - name: Terraform apply
          id: apply
@@ -235,7 +234,7 @@ jobs:
         uses: actions/checkout@master
   
       - name: Configure AWS credentials from AWS account
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -256,7 +255,6 @@ jobs:
         with:
           name: ${{ env.TF_WORKSPACE }}-terraform-output
           path: ./pytest/
-          if-no-files-found: error
   
       - name: Rename artifact for tests
         run: mv ./pytest/$tfoutput_artifact_name ./pytest/terraform_output.py
@@ -308,7 +306,7 @@ jobs:
              "Do you approve deploying terraform infra in prod environment?"
 
        - name: Configure AWS credentials from AWS account
-         uses: aws-actions/configure-aws-credentials@v1
+         uses: aws-actions/configure-aws-credentials@v4
          with:
            aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
            aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -328,7 +326,6 @@ jobs:
          with:
            name: ${{ env.TF_WORKSPACE }}-terraform-plan
            path: ./terraform/
-           if-no-files-found: error
   
        - name: Terraform apply
          id: apply
@@ -369,7 +366,7 @@ jobs:
         uses: actions/checkout@master
   
       - name: Configure AWS credentials from AWS account
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -390,7 +387,6 @@ jobs:
         with:
           name: ${{ env.TF_WORKSPACE }}-terraform-output
           path: ./pytest/
-          if-no-files-found: error
   
       - name: Rename artifact for tests
         run: mv ./pytest/$tfoutput_artifact_name ./pytest/terraform_output.py
@@ -427,7 +423,7 @@ jobs:
         uses: actions/checkout@master  
 
       - name: Configure AWS credentials from AWS account
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
