@@ -108,7 +108,7 @@ jobs:
         run: terraform -chdir=terraform plan -out $tfplan_artifact_name
 
       - name: Upload artifact for deployment
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.TF_WORKSPACE }}-terraform-plan
           path: ./terraform/${{ env.tfplan_artifact_name }}
@@ -145,7 +145,7 @@ jobs:
          run: terraform -chdir=terraform init
 
        - name: Download artifact for deployment
-         uses: actions/download-artifact@v3
+         uses: actions/download-artifact@v4
          with:
            name: ${{ env.TF_WORKSPACE }}-terraform-plan
            path: ./terraform/
@@ -163,7 +163,7 @@ jobs:
            sed '/^\(cloudfront\|ecs\|rds\)/!d' <./terraform/terraform.output >./terraform/$tfoutput_artifact_name
  
        - name: Upload terraform output artifact for tests
-         uses: actions/upload-artifact@v3
+         uses: actions/upload-artifact@v4
          with:
            name: ${{ env.TF_WORKSPACE }}-terraform-output
            path: ./terraform/${{ env.tfoutput_artifact_name }}
@@ -193,7 +193,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: 3.10.12
 
@@ -203,11 +203,10 @@ jobs:
           pip install pytest pytest-md pytest-emoji
 
       - name: Download artifact for tests
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{ env.TF_WORKSPACE }}-terraform-output
           path: ./pytest/
-          if-no-files-found: error
  
       - name: Rename artifact for tests
         run: mv ./pytest/$tfoutput_artifact_name ./pytest/terraform_output.py
@@ -272,7 +271,6 @@ jobs:
           issue-title: 'Manual Approval for destroying dev infra'
           issue-body: |
             "Do you approve applying terraform destroy on dev deployment?"
-          continue-on-error: true
 
       - name: Terraform destroy
         id: destroy
