@@ -1,12 +1,5 @@
 name: "Terraform deployment on prod"
 on:
-    ################ TEST ###################
-    push:
-      branches:
-        - charlotte-dev
-      paths-ignore:
-        - "README.md"
-    ################ TEST ###################
     pull_request:
       branches:
         - prd
