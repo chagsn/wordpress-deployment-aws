@@ -29,7 +29,7 @@ jobs:
         uses: actions/checkout@master
 
       - name: Configure AWS credentials from AWS account
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
         TF_WORKSPACE: dev
-        tfplan_artifact_name: dev-tfplan-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
+        tfplan_artifact_name: dev-tfplan-${{ github.head_ref }}-${{ github.run_id }}-${{ github.run_attempt }}
     defaults:
       run:
         shell: bash
@@ -86,7 +86,7 @@ jobs:
         uses: actions/checkout@master
 
       - name: Configure AWS credentials from AWS account
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -119,7 +119,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
         TF_WORKSPACE: prod
-        tfplan_artifact_name: prod-tfplan-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
+        tfplan_artifact_name: prod-tfplan-${{ github.head_ref }}-${{ github.run_id }}-${{ github.run_attempt }}
     defaults:
       run:
         shell: bash
@@ -129,7 +129,7 @@ jobs:
         uses: actions/checkout@master  
 
       - name: Configure AWS credentials from AWS account
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -162,8 +162,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
         TF_WORKSPACE: dev
-        tfplan_artifact_name: dev-tfplan-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
-        tfoutput_artifact_name: dev-tfoutput-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
+        tfplan_artifact_name: dev-tfplan-${{ github.head_ref }}-${{ github.run_id }}-${{ github.run_attempt }}
+        tfoutput_artifact_name: dev-tfoutput-${{ github.head_ref }}-${{ github.run_id }}-${{ github.run_attempt }}
     defaults:
       run:
         shell: bash
@@ -174,7 +174,7 @@ jobs:
          uses: actions/checkout@master
  
        - name: Configure AWS credentials from AWS account
-         uses: aws-actions/configure-aws-credentials@v1
+         uses: aws-actions/configure-aws-credentials@v4
          with:
            aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
            aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -194,7 +194,6 @@ jobs:
          with:
            name: ${{ env.TF_WORKSPACE }}-terraform-plan
            path: ./terraform/
-           if-no-files-found: error
   
        - name: Terraform apply
          id: apply
@@ -222,7 +221,7 @@ jobs:
    runs-on: ubuntu-latest
    env:
       TF_WORKSPACE: dev
-      tfoutput_artifact_name: dev-tfoutput-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
+      tfoutput_artifact_name: dev-tfoutput-${{ github.head_ref }}-${{ github.run_id }}-${{ github.run_attempt }}
    defaults:
      run:
        shell: bash
@@ -235,7 +234,7 @@ jobs:
         uses: actions/checkout@master
   
       - name: Configure AWS credentials from AWS account
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -256,7 +255,6 @@ jobs:
         with:
           name: ${{ env.TF_WORKSPACE }}-terraform-output
           path: ./pytest/
-          if-no-files-found: error
   
       - name: Rename artifact for tests
         run: mv ./pytest/$tfoutput_artifact_name ./pytest/terraform_output.py
@@ -284,8 +282,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
         TF_WORKSPACE: prod
-        tfplan_artifact_name: prod-tfplan-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
-        tfoutput_artifact_name: prod-tfoutput-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
+        tfplan_artifact_name: prod-tfplan-${{ github.head_ref }}-${{ github.run_id }}-${{ github.run_attempt }}
+        tfoutput_artifact_name: prod-tfoutput-${{ github.head_ref }}-${{ github.run_id }}-${{ github.run_attempt }}
     defaults:
       run:
         shell: bash
@@ -308,7 +306,7 @@ jobs:
              "Do you approve deploying terraform infra in prod environment?"
 
        - name: Configure AWS credentials from AWS account
-         uses: aws-actions/configure-aws-credentials@v1
+         uses: aws-actions/configure-aws-credentials@v4
          with:
            aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
            aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -328,7 +326,6 @@ jobs:
          with:
            name: ${{ env.TF_WORKSPACE }}-terraform-plan
            path: ./terraform/
-           if-no-files-found: error
   
        - name: Terraform apply
          id: apply
@@ -356,7 +353,7 @@ jobs:
    runs-on: ubuntu-latest
    env:
       TF_WORKSPACE: prod
-      tfoutput_artifact_name: prod-tfoutput-${{ github.ref_name }}-${{ github.run_id }}-${{ github.run_attempt }}
+      tfoutput_artifact_name: prod-tfoutput-${{ github.head_ref }}-${{ github.run_id }}-${{ github.run_attempt }}
    defaults:
      run:
        shell: bash
@@ -369,7 +366,7 @@ jobs:
         uses: actions/checkout@master
   
       - name: Configure AWS credentials from AWS account
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -390,7 +387,6 @@ jobs:
         with:
           name: ${{ env.TF_WORKSPACE }}-terraform-output
           path: ./pytest/
-          if-no-files-found: error
   
       - name: Rename artifact for tests
         run: mv ./pytest/$tfoutput_artifact_name ./pytest/terraform_output.py
@@ -427,7 +423,7 @@ jobs:
         uses: actions/checkout@master  
 
       - name: Configure AWS credentials from AWS account
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id:  ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key:  ${{ secrets.AWS_SECRET_ACCESS_KEY }}
