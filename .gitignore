@@ -1,2 +1,6 @@
 # Ignore terraform init directory and lock file
 terraform/.terraform*
+
+# Ignore pytests cache files
+pytest/.pytest_cache/*
+pytest/__pycache__/*

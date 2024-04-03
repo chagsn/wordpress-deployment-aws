@@ -80,14 +80,6 @@ resource "aws_security_group" "db_security_group" {
     security_groups = [aws_security_group.ecs_security_group.id]
   }
 
-  # Outbound rule: allow outbound traffic to anywhere in HTTPS (to allow access to AWS APIs, e.g Cloudwatch)
-  egress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks       = ["0.0.0.0/0"]
-  }
-
   tags = {
     Terraform   = "true"
     Environment = var.env
@@ -108,9 +100,9 @@ resource "aws_security_group_rule" "ecs_sg_ingress_rule_alb" {
   source_security_group_id = aws_security_group.alb_security_group.id
 }
 
-# Outbound rule: allow outbound traffic to anywhere in HTTPS (to allow access to wordpress repo in ECR Public Gallery and AWS APIs)
-resource "aws_security_group_rule" "ecs_sg_egress_rule_alb" {
-  description = "Security group egress rules for ECS wordpress service: allow HTTP/HTTPS outbound traffic to anywhere"
+# Outbound rule: allow outbound traffic to anywhere in HTTPS (to allow access to wordpress repo in ECR Public Gallery)
+resource "aws_security_group_rule" "ecs_sg_egress_rule_https" {
+  description = "Security group egress rules for ECS wordpress service: allow HTTPS outbound traffic to anywhere"
   # for_each = toset(local.alb_sg_ports)
   type              = "egress"
   # from_port         = each.key

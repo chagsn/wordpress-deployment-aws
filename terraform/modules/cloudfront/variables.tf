@@ -1,20 +1,14 @@
-variable "S3_logs_dns" {
+variable "s3_logs_dns" {
+  description = "DNS name of the S3 bucket dedicated to Cloudfront logs storage"
   type = string
 }
 
-variable "S3_one_regional_dns" {
+variable "s3_wordpress_media_dns" {
+  description = "DNS name of the S3 bucket hosting wordpress media"
   type = string
 }
 
 variable "alb_dns_name" {
+  description = "DNS name of the Application Load Balancer"
   type = string
-}
-
-variable "viewer_certificate" {
-  description = "The SSL configuration for this distribution"
-  type        = any
-  default = {
-    cloudfront_default_certificate = true
-    minimum_protocol_version       = "TLSv1"
-  }
 }
