@@ -3,10 +3,10 @@
  This team project was developped with [Serge Keita](https://github.com/sergemad) in the framework of our **Cloud/DevOps training bootcamp** at Datascientest.
 
  **Contents**:
- - [Project objective and specifications](url)
- - [AWS architecture design](url)
- - [Automation of infrastructure deployment: Terraform](url)
- - [CI/CD Pipeline: GitHub Action](url)
+ - [Project objective and specifications](https://github.com/chagsn/wordpress-deployment-aws/blob/prd/README.md#1-project-objective-and-specifications)
+ - [AWS architecture design](https://github.com/chagsn/wordpress-deployment-aws/blob/prd/README.md#2-aws-architecture-design)
+ - [Automation of infrastructure deployment: Terraform](https://github.com/chagsn/wordpress-deployment-aws/blob/prd/README.md#3-automation-of-infrastructure-deployment-terraform)
+ - [CI/CD Pipeline: GitHub Action](https://github.com/chagsn/wordpress-deployment-aws/blob/prd/README.md#4-cicd-pipeline-github-actions)
 
   ## 1. Project objective and specifications
   The objective of the project was to **deploy Wordpress CMS on multiple webservers in the AWS cloud**.
