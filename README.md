@@ -88,13 +88,34 @@ Tu further boost the application's performance, some Wordpress plugins (eg. [WP 
 
 ## 3. Automation of infrastructure deployment: Terraform
 
+**Terraform** is an open-source **Infrasructure as Code** tool that **automates the provisioning and management of infrastructure resources** using configuration scripts. It supports a wide range of cloud providers, inlcluding AWS.
+
+For this project, it was used to automate the deployment of the AWS architecture presented in the previous section.
+
 ### Code structure
+
+Our Terraform scripts are available in the `terraform` directory. The code is structured as follows:
+- **Terraform backend and AWS provider** configuration: `provider.tf`
+- **Root module** `main.tf`: calls and connects child modules with each other
+- **Child modules**: one child module for each infrastructure component
+- Deployment **inputs**: `variables.tf`
+- Deployment **outputs**: `outputs.tf`, used to test the resulting infrastructure after deployment
+
+![image](https://github.com/chagsn/wordpress-deployment-aws/assets/102815082/d275e72e-0fef-4c74-80a5-c3c36a208b0b)
+
+Infrastructure resources are provisionned within the different child modules, leveraging **off-the-shelf modules from the Terraform Registry** as much as possible.
 
 ### Backend and provider configuration
 
+The Terraform backend and AWS provider configuration adheres to essential **best practices** related to security, software version compatibilty, and team collaboration:
+- Creation of a **dedicated IAM user for Terraform** in AWS account, with limited permissions (in accordance with **least privilege principle**)
+- **Specification of** Terraform and provider (and registry modules) **versions**
+- **Remote Terraform state** stored on S3 (enabling collaborative work)
+- **State locking** using DynamoDB (to prevent simultaneous deployments and ensure deployment consistency)
+
 ### Environments management
 
-In this project two deployment environments were considered: development (**dev**) and production (**prod**).
+In this project **two deployment environments** were considered: development (**dev**) and production (**prod**).
 
 Terraform provides a way to manage deployment environments through the concept of **workspaces**.
 
