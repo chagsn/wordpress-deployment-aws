@@ -87,7 +87,11 @@ Tu further boost the application's performance, some Wordpress plugins (eg. [WP 
 
 ### Route 53
 
+Route 53 is used here both as **domain registrar** and **DNS service**.
+
 ### CloudWatch
+
+The architecture's various instances are monitored using **AWS monitoring service CloudWatch**, to get real-time metrics and detect potential anomalies, and thus ensure application availability and performance.
 
 ## 3. Automation of infrastructure deployment: Terraform
 
@@ -126,4 +130,16 @@ For certain variables, different input values are specified in `variable.tf` dep
 
 ## 4. CI/CD Pipeline: GitHub Actions
 
+The deployment of our Terraform application is **automated through a CI/CD pipeline** built with **GitHub Actions**.
+
+**Two workflows** have been implemented:
+1. Deployment in **dev environment**, triggered by a **Pull Request on dev Git branch**
+2. Deployment in **prod environment**, triggered by a **Pull Request on prod Git branch**
+
+### Dev workflow
+The dev workflow is triggered by a PR on dev branch and implements the following steps:
+- Code **validation** and **static testing**. Static tests evaluate the deployed infrastructure from a **security** perspective. They are performed using **Policy as Code tool tfsec**.
+- Code **building**: an execution plan listing the changes that Terraform plans to make to the infrastructure is generated as an artifact.
+- Infrastructure **deployment**: Terraform execution plan is used to effectively deploy infrastructure in the AWS cloud. Terraform outputs are stored in an second artifact that will be used for testing.
+- Infrastructure **testing**: using pytest and boto3 library)
 
