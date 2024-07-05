@@ -1,6 +1,9 @@
 ﻿# DevOps project: Highly-available Wordpress deployment on AWS
 
- This team project was developped with Serge Keita (https://github.com/sergemad) in the framework of our **Cloud/DevOps training bootcamp** at Datascientest.
+ This team project was developped with [Serge Keita](https://github.com/sergemad) in the framework of our **Cloud/DevOps training bootcamp** at Datascientest.
+
+ **Contents**:
+ - 
 
   ## 1. Project objective and specifications
   The objective of the project was to **deploy Wordpress CMS on multiple webservers in the AWS cloud**.
@@ -58,7 +61,7 @@ Wordpress database is hosted on a **RDS-MySQL** database, in **multi-AZ configur
 
 Another option considered, which would have been even more interesting in terms of performance/scalability/availability, was **Amazon Aurora**. However, we ultimately chose RDS to keep costs down.
 
-Access to the database is secured by a password managed with **Secrets Manager**.
+Access to the database is secured by a password managed with **Secrets Manager**, enabling **automatic password rotation**.
 
 ### Application Load Balancer
 
@@ -72,4 +75,31 @@ The ALB performs **health checks** on the ECS Tasks to route traffic only to hea
 
 It is a **Content Delivery Network (CDN)**: it caches users requests results, and delivers content right from the Edge Locations, as close to the users as possible.
 
-This allows to **reduce latency** and **offload traffic** from the Application Load Balancer (and thus from the web servers).
+This allows to **reduce latency** and **offload traffic** from the Application Load Balancer, and thus from the web servers.
+
+### S3 bucket
+
+Tu further boost the application's performance, some Wordpress plugins (eg. [WP OFFLOAD MEDIA]((https://deliciousbrains.com/wp-offload-media/)) allow to **automatically store website static content** (media and assests) in an **S3 bucket**.
+**Static content** is then served by CloudFront **directly from S3**, offloading further the server resources, which can focus on dynamic content delivery.
+
+### Route 53
+
+### CloudWatch
+
+## 3. Automation of infrastructure deployment: Terraform
+
+### Code structure
+
+### Backend and provider configuration
+
+### Environments management
+
+In this project two deployment environments were considered: development (**dev**) and production (**prod**).
+
+Terraform provides a way to manage deployment environments through the concept of **workspaces**.
+
+For certain variables, different input values are specified in `variable.tf` depending on the deployment environment, and the relevant input values to be used for a given deployment are automatically selected in `main.tf`, based on the workspace being deployed.
+
+
+
+
