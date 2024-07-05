@@ -3,7 +3,10 @@
  This team project was developped with [Serge Keita](https://github.com/sergemad) in the framework of our **Cloud/DevOps training bootcamp** at Datascientest.
 
  **Contents**:
- - 
+ - [Project objective and specifications](url)
+ - [AWS architecture design](url)
+ - [Automation of infrastructure deployment: Terraform](url)
+ - [CI/CD Pipeline: GitHub Action](url)
 
   ## 1. Project objective and specifications
   The objective of the project was to **deploy Wordpress CMS on multiple webservers in the AWS cloud**.
@@ -121,6 +124,6 @@ Terraform provides a way to manage deployment environments through the concept o
 
 For certain variables, different input values are specified in `variable.tf` depending on the deployment environment, and the relevant input values to be used for a given deployment are automatically selected in `main.tf`, based on the workspace being deployed.
 
-
+## 4. CI/CD Pipeline: GitHub Actions
 
 
